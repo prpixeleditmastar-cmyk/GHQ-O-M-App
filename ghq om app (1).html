@@ -1,0 +1,3589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GHQ Engineering O&M Dashboard - Golden Edition</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      /* Golden Color Palette */
+      --gold-primary: #d4af37;
+      --gold-light: #f3e5ab;
+      --gold-dark: #996515;
+      --gold-gradient: linear-gradient(135deg, #d4af37 0%, #f3e5ab 50%, #aa771c 100%);
+      --gold-glow: rgba(212, 175, 55, 0.25);
+
+      /* Dark Luxury Backgrounds */
+      --bg-dark: #0b0f19;
+      --panel-dark: #0f172a;
+      --surface-dark: #162032;
+      --card-bg: #131c2e;
+      --text-gold: #f5d77f;
+      --text-white: #ffffff;
+      --text-muted: #94a3b8;
+      --border-gold: rgba(212, 175, 55, 0.35);
+
+      /* Accent Highlights */
+      --danger: #ef4444;
+      --success: #10b981;
+      --cyan: #38bdf8;
+      --amber: #fbbf24;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #060911;
+      color: var(--text-white);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    /* Mobile Container Frame */
+    .app-container {
+      width: 100%;
+      max-width: 480px;
+      min-height: 100vh;
+      background: var(--bg-dark);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 0 35px rgba(212, 175, 55, 0.12);
+      padding-bottom: 80px;
+      border-left: 1px solid var(--border-gold);
+      border-right: 1px solid var(--border-gold);
+    }
+
+    /* Top App Bar */
+    .top-bar {
+      background: #090d16;
+      border-bottom: 1px solid var(--border-gold);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .top-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .menu-btn, .action-btn {
+      background: none;
+      border: none;
+      color: var(--gold-primary);
+      font-size: 1.25rem;
+      cursor: pointer;
+    }
+
+    .header-titles h1 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      background: var(--gold-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .header-titles p {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Shift Status Ribbon */
+    .status-ribbon {
+      background: #111827;
+      color: #cbd5e1;
+      padding: 8px 18px;
+      font-size: 0.75rem;
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    }
+
+    .status-ribbon b {
+      color: var(--gold-light);
+    }
+
+    .badge-live {
+      color: var(--gold-primary);
+      font-weight: bold;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* Screen Views */
+    .screen-view {
+      display: none;
+      padding: 16px;
+      flex-direction: column;
+      gap: 18px;
+      animation: fadeIn 0.25s ease-in-out;
+    }
+
+    .screen-view.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Section Titles */
+    .section-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--gold-light);
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      letter-spacing: 0.3px;
+    }
+
+    .section-title a {
+      font-size: 0.78rem;
+      color: var(--gold-primary);
+      text-decoration: none;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    /* Quick Action Buttons */
+    .quick-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .action-pill {
+      flex: 1;
+      background: var(--surface-dark);
+      border: 1px solid var(--border-gold);
+      border-radius: 12px;
+      padding: 12px 6px;
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-white);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      transition: all 0.2s ease;
+    }
+
+    .action-pill:active {
+      transform: scale(0.97);
+      border-color: var(--gold-primary);
+    }
+
+    .action-pill i {
+      font-size: 1.2rem;
+      color: var(--gold-primary);
+    }
+
+    /* 4-Item Grid for Consumption Metrics */
+    .metric-grid-4 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .metric-card {
+      background: var(--surface-dark);
+      padding: 12px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border-gold);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    }
+
+    .metric-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .metric-header i {
+      color: var(--gold-primary);
+      font-size: 0.85rem;
+    }
+
+    .metric-val {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--gold-light);
+      margin-top: 2px;
+    }
+
+    .metric-sub {
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .sub-section-box {
+      background: rgba(22, 32, 50, 0.6);
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .sub-section-header {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--gold-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    /* Sub-Operations Module Views (Electrical, HVAC, Plumbing, DG) */
+    .op-screen-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-gold);
+      padding-bottom: 12px;
+    }
+
+    .op-back-btn {
+      background: rgba(212, 175, 55, 0.15);
+      border: 1px solid var(--border-gold);
+      color: var(--gold-light);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .op-title-area h2 {
+      font-size: 1.15rem;
+      color: var(--gold-light);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .op-title-area p {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    /* Sub-nav Category Tabs */
+    .cat-tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .cat-tab-btn {
+      flex: 1;
+      white-space: nowrap;
+      background: var(--surface-dark);
+      border: 1px solid var(--border-gold);
+      color: var(--text-muted);
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .cat-tab-btn.active {
+      background: var(--gold-gradient);
+      color: #0b0f19;
+      border-color: var(--gold-light);
+    }
+
+    /* Sub Section Container */
+    .tab-content-panel {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .tab-content-panel.active {
+      display: flex;
+    }
+
+    /* Operational Detail Cards */
+    .op-item-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-gold);
+      border-radius: 10px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    }
+
+    .op-item-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .tag-badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+
+    .tag-pm { background: rgba(56, 189, 248, 0.15); color: var(--cyan); border: 1px solid rgba(56, 189, 248, 0.35); }
+    .tag-major { background: rgba(212, 175, 55, 0.15); color: var(--gold-primary); border: 1px solid var(--border-gold); }
+    .tag-pending { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.35); }
+    .tag-trial { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.35); }
+
+    .op-item-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-white);
+    }
+
+    .op-item-desc {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .op-item-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 6px;
+      border-top: 1px dashed rgba(212, 175, 55, 0.2);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    /* Buttons */
+    .btn-gold-outline {
+      border: 1px solid var(--gold-primary);
+      background: transparent;
+      color: var(--gold-light);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.74rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-gold-outline:hover {
+      background: var(--gold-glow);
+    }
+
+    .btn-gold-solid {
+      border: none;
+      background: var(--gold-gradient);
+      color: #0b0f19;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.74rem;
+      cursor: pointer;
+    }
+
+    /* Original Bottom Navigation Bar */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      max-width: 480px;
+      background: #090d16;
+      border-top: 1px solid var(--border-gold);
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 0;
+      z-index: 40;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      width: 20%;
+    }
+
+    .nav-item.active {
+      color: var(--gold-primary);
+      font-weight: 700;
+    }
+
+    .nav-item i {
+      font-size: 1.25rem;
+    }
+
+    /* Sidebar Drawer Navigation */
+    .sidebar-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.65);
+      z-index: 100;
+      display: none;
+      backdrop-filter: blur(3px);
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -300px;
+      width: 300px;
+      height: 100vh;
+      background: #0d131f;
+      z-index: 101;
+      transition: left 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 2px 0 16px rgba(212, 175, 55, 0.15);
+      border-right: 1px solid var(--border-gold);
+    }
+
+    .sidebar.open {
+      left: 0;
+    }
+
+    .sidebar-header {
+      background: #090d16;
+      padding: 22px 16px;
+      border-bottom: 1px solid var(--border-gold);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .sidebar-header h2 {
+      font-size: 1.15rem;
+      background: var(--gold-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .sidebar-header p {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .sidebar-menu {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 0;
+    }
+
+    .menu-group-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--gold-primary);
+      padding: 14px 18px 4px;
+      letter-spacing: 0.8px;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 18px;
+      color: #e2e8f0;
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border-left: 3px solid transparent;
+    }
+
+    .menu-item:hover, .menu-item.active {
+      background: rgba(212, 175, 55, 0.12);
+      color: var(--gold-light);
+      border-left-color: var(--gold-primary);
+    }
+
+    .menu-item i {
+      font-size: 1.05rem;
+      width: 22px;
+      color: var(--gold-primary);
+    }
+
+    .menu-badge {
+      margin-left: auto;
+      background: var(--gold-gradient);
+      color: #0b0f19;
+      font-size: 0.65rem;
+      padding: 2px 7px;
+      border-radius: 10px;
+      font-weight: 800;
+    }
+  
+
+    /* Calendar Styling in Golden Theme */
+    .ppm-calendar-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-gold);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+    }
+
+    .cal-controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .cal-select-group {
+      display: flex;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .cal-select {
+      flex: 1;
+      background: #090d16;
+      color: var(--gold-light);
+      border: 1px solid var(--border-gold);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .cal-select option {
+      background: #0f172a;
+      color: #fff;
+    }
+
+    .cal-nav-btn {
+      background: rgba(212, 175, 55, 0.15);
+      border: 1px solid var(--border-gold);
+      color: var(--gold-primary);
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: background 0.2s;
+    }
+
+    .cal-nav-btn:hover {
+      background: var(--gold-glow);
+    }
+
+    /* Weekday Headers */
+    .cal-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--gold-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    }
+
+    .cal-weekdays span.sun {
+      color: #fca5a5;
+    }
+
+    /* Month Grid Days */
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+    }
+
+    .cal-day {
+      min-height: 48px;
+      background: rgba(22, 32, 50, 0.4);
+      border: 1px solid rgba(212, 175, 55, 0.15);
+      border-radius: 8px;
+      padding: 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 3px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+
+    .cal-day:hover {
+      border-color: var(--gold-primary);
+      background: rgba(212, 175, 55, 0.1);
+    }
+
+    .cal-day.empty {
+      background: transparent;
+      border-color: transparent;
+      cursor: default;
+    }
+
+    .cal-day-num {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-white);
+    }
+
+    .cal-day.today {
+      border-color: var(--gold-primary);
+      background: rgba(212, 175, 55, 0.22);
+      box-shadow: 0 0 8px var(--gold-glow);
+    }
+
+    .cal-day.today .cal-day-num {
+      color: var(--gold-light);
+    }
+
+    .cal-day.selected {
+      background: var(--gold-gradient);
+      border-color: var(--gold-light);
+    }
+
+    .cal-day.selected .cal-day-num {
+      color: #0b0f19;
+    }
+
+    .cal-day-dots {
+      display: flex;
+      gap: 2px;
+      align-items: center;
+      margin-top: 1px;
+    }
+
+    .cal-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+    }
+
+    .dot-elec { background: #38bdf8; }
+    .dot-hvac { background: #34d399; }
+    .dot-plumb { background: #fbbf24; }
+
+    .cal-legend {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      padding-top: 4px;
+      border-top: 1px dashed rgba(212, 175, 55, 0.2);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    
+        /* Monthly PPM Summary Box with Complete & Pending */
+    .cal-month-summary-box {
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid var(--border-gold);
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .month-sum-main {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+      padding-bottom: 6px;
+    }
+
+    .month-sum-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--gold-light);
+    }
+
+    .month-sum-val {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--gold-primary);
+    }
+
+    .month-sum-table {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .sum-row-header {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      padding: 0 4px 4px;
+      border-bottom: 1px dashed rgba(212, 175, 55, 0.15);
+      text-align: center;
+    }
+
+    .sum-row-header span:first-child {
+      text-align: left;
+    }
+
+    .sum-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      align-items: center;
+      font-size: 0.76rem;
+      padding: 2px 4px;
+      text-align: center;
+    }
+
+    .dept-col {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-white);
+      text-align: left;
+      font-weight: 600;
+    }
+
+    .sum-badge {
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      width: fit-content;
+      margin: 0 auto;
+      min-width: 24px;
+    }
+
+    .total-badge {
+      color: var(--gold-light);
+      background: rgba(212, 175, 55, 0.15);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+    }
+
+    .comp-badge {
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .pend-badge {
+      color: #f87171;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .sum-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+    }
+
+    .selected-date-banner {
+      background: rgba(22, 32, 50, 0.8);
+      border: 1px solid var(--border-gold);
+      border-radius: 8px;
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.78rem;
+    }
+
+
+
+    /* Reading Input & Result Display Boxes */
+    .reading-result-box {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid var(--border-gold);
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .res-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--gold-light);
+      border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+      padding-bottom: 6px;
+    }
+
+    .reading-metric-pair {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .read-box {
+      border-radius: 8px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .prev-box {
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+    }
+
+    .curr-box {
+      background: rgba(212, 175, 55, 0.12);
+      border: 1px solid var(--border-gold);
+    }
+
+    .r-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .curr-box .r-label {
+      color: var(--gold-light);
+    }
+
+    .r-val {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .curr-box .r-val {
+      color: var(--gold-light);
+    }
+
+    .r-val small {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--gold-primary);
+    }
+
+
+
+    /* Reports (DSR / WSR / MMR) UI Styling */
+    .report-preview-box {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid var(--border-gold);
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .rep-preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--gold-light);
+      border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+      padding-bottom: 6px;
+    }
+
+    .rep-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .rep-stat-item {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(212, 175, 55, 0.15);
+      border-radius: 8px;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .stat-lbl {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .stat-val {
+      font-size: 0.88rem;
+      color: var(--text-white);
+      font-weight: 700;
+    }
+
+    .export-actions-group {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .btn-export-pdf {
+      background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+      color: #ffffff;
+      border: 1px solid #f87171;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 2px 6px rgba(239, 68, 68, 0.25);
+      transition: all 0.2s ease;
+    }
+
+    .btn-export-pdf:active {
+      transform: scale(0.97);
+    }
+
+    .btn-export-excel {
+      background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+      color: #ffffff;
+      border: 1px solid #34d399;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25);
+      transition: all 0.2s ease;
+    }
+
+    .btn-export-excel:active {
+      transform: scale(0.97);
+    }
+
+
+
+    /* Asset Master UI Styling */
+    .asset-cat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-gold);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      transition: all 0.2s ease;
+    }
+
+    .asset-cat-card:hover, .asset-cat-card:active {
+      transform: translateY(-2px);
+      border-color: var(--gold-primary);
+      background: rgba(212, 175, 55, 0.08);
+    }
+
+    .asset-cat-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .asset-icon-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      border: 1px solid;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+    }
+
+    .asset-cat-info h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-white);
+    }
+
+    .asset-cat-info p {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .asset-cat-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .asset-count-badge {
+      background: var(--gold-gradient);
+      color: #0b0f19;
+      font-size: 0.82rem;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(212, 175, 55, 0.3);
+    }
+
+    /* Asset Sheet Details View */
+    .sheet-top-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+      padding-bottom: 10px;
+    }
+
+    .sheet-back-btn {
+      background: rgba(212, 175, 55, 0.15);
+      border: 1px solid var(--border-gold);
+      color: var(--gold-light);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .sheet-header-title {
+      text-align: right;
+    }
+
+    .sheet-header-title h3 {
+      font-size: 0.98rem;
+      color: var(--gold-light);
+      font-weight: 700;
+    }
+
+    /* Asset Item Card inside Sheet */
+    .sheet-asset-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-gold);
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    .asset-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .asset-tag-badge {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--gold-primary);
+      background: rgba(212, 175, 55, 0.15);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      padding: 2px 8px;
+      border-radius: 5px;
+      letter-spacing: 0.5px;
+    }
+
+    .asset-status-badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .status-running {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+
+    .status-standby {
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+    }
+
+    .status-maint {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.35);
+    }
+
+    .asset-title-text {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text-white);
+    }
+
+    .asset-specs-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 4px;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      background: rgba(11, 15, 25, 0.6);
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .asset-specs-grid span b {
+      color: #cbd5e1;
+    }
+
+</style>
+</head>
+<body>
+
+  <div class="app-container">
+
+    <!-- Sidebar Overlay & Drawer -->
+    <div class="sidebar-overlay" id="overlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h2>GHQ Facility O&M</h2>
+        <p>Engineering Operations Suite</p>
+      </div>
+      <div class="sidebar-menu">
+        <div class="menu-group-label">Daily Operations</div>
+        <div class="menu-item" onclick="openModule('screen-electrical')">
+          <i class="fa-solid fa-bolt"></i> 
+          <span>Electrical</span>
+        </div>
+        <div class="menu-item" onclick="openModule('screen-hvac')">
+          <i class="fa-solid fa-snowflake"></i> 
+          <span>HVAC</span>
+        </div>
+        <div class="menu-item" onclick="openModule('screen-plumbing')">
+          <i class="fa-solid fa-faucet-drip"></i> 
+          <span>Plumbing</span>
+        </div>
+        <div class="menu-item" onclick="openModule('screen-dg')">
+          <i class="fa-solid fa-gas-pump"></i> 
+          <span>DG & Fuel</span>
+        </div>
+
+        <div class="menu-group-label">Maintenance & Safety</div>
+        <div class="menu-item" onclick="openModule('screen-ppm')">
+          <i class="fa-solid fa-calendar-check"></i> 
+          <span>PPM Calendar</span>
+        </div>
+        <div class="menu-item" onclick="openModule('screen-reports')">
+          <i class="fa-solid fa-file-contract"></i> 
+          <span>Reports (DSR / WSR / MMR)</span>
+        </div>
+        <div class="menu-item" onclick="openModule('screen-dashboard')">
+          <i class="fa-solid fa-triangle-exclamation"></i> 
+          <span>Breakdown Tracker</span> 
+          <span class="menu-badge">2</span>
+        </div>
+        <div class="menu-item" onclick="openModule('screen-dashboard')">
+          <i class="fa-solid fa-clipboard-check"></i> 
+          <span>Permit to Work PTW LOTO</span>
+        </div>
+        <div class="menu-item" onclick="openModule('screen-dashboard')">
+          <i class="fa-solid fa-fire-extinguisher"></i> 
+          <span>Fire & Life Safety FLS</span>
+        </div>
+
+        <div class="menu-group-label">Inventory & Management</div>
+        <div class="menu-item" onclick="openModule('screen-dashboard')">
+          <i class="fa-solid fa-boxes-stacked"></i> 
+          <span>Spares & Consumables</span>
+        </div>
+        <div class="menu-item" onclick="openModule('screen-dashboard')">
+          <i class="fa-solid fa-users"></i> 
+          <span>Duty Shift Roster</span>
+        </div>
+        <div class="menu-item" onclick="openModule('screen-dashboard')">
+          <i class="fa-solid fa-file-invoice"></i> 
+          <span>MIS & Consumption Reports</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top App Bar -->
+    <header class="top-bar">
+      <div class="top-bar-left">
+        <button class="menu-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+        <div class="header-titles">
+          <h1>GHQ Engineering</h1>
+          <p id="top-bar-sub">Operations & Maintenance Manager</p>
+        </div>
+      </div>
+      <button class="action-btn" onclick="openModule('screen-dashboard')"><i class="fa-solid fa-bell"></i></button>
+    </header>
+
+    <!-- Shift Status Ribbon -->
+    <div class="status-ribbon">
+      <span>Duty In-Charge: <b>Supervisor 1</b></span>
+      <span>Status: <span class="badge-live"><i class="fa-solid fa-circle" style="font-size:0.5rem"></i> Active</span></span>
+    </div>
+
+    <!-- ==================== SCREEN 1: MAIN DASHBOARD ==================== -->
+    <main class="screen-view active" id="screen-dashboard">
+
+      <!-- Quick Action Buttons -->
+      <section class="quick-actions">
+        <div class="action-pill" onclick="openModule('screen-readings')">
+          <i class="fa-solid fa-pen-to-square"></i>
+          <span>Log Reading</span>
+        </div>
+        <div class="action-pill" onclick="openModule('screen-electrical', 'tab-elec-pending')">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <span>New Breakdown</span>
+        </div>
+        <div class="action-pill">
+          <i class="fa-solid fa-qrcode"></i>
+          <span>Scan QR</span>
+        </div>
+        <div class="action-pill">
+          <i class="fa-solid fa-file-shield"></i>
+          <span>PTW Permit</span>
+        </div>
+      </section>
+
+      <!-- Daily Consumption Section -->
+      <section>
+        <div class="section-title">
+          <span>Daily Consumption</span>
+          <a href="#">View Analytics</a>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:12px;">
+
+          <!-- GHQ Facility Block -->
+          <div class="sub-section-box">
+            <div class="sub-section-header">
+              <i class="fa-solid fa-building"></i> GHQ Facility
+            </div>
+            <div class="metric-grid-4">
+              <div class="metric-card">
+                <div class="metric-header">
+                  <span>Electrical</span>
+                  <i class="fa-solid fa-bolt"></i>
+                </div>
+                <div class="metric-val">4,820</div>
+                <div class="metric-sub">kWh</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-header">
+                  <span>DWS Water</span>
+                  <i class="fa-solid fa-faucet"></i>
+                </div>
+                <div class="metric-val">12.4</div>
+                <div class="metric-sub">kL Domestic</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-header">
+                  <span>FWS Water</span>
+                  <i class="fa-solid fa-droplet"></i>
+                </div>
+                <div class="metric-val">6.1</div>
+                <div class="metric-sub">kL Flushing</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-header">
+                  <span>BTU</span>
+                  <i class="fa-solid fa-fire-flame-curved"></i>
+                </div>
+                <div class="metric-val">363.4</div>
+                <div class="metric-sub">MWH</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- NMAEYC Block -->
+          <div class="sub-section-box">
+            <div class="sub-section-header">
+              <i class="fa-solid fa-landmark"></i> NMAEYC
+            </div>
+            <div class="metric-grid-4">
+              <div class="metric-card">
+                <div class="metric-header">
+                  <span>Electrical</span>
+                  <i class="fa-solid fa-bolt"></i>
+                </div>
+                <div class="metric-val">1,650</div>
+                <div class="metric-sub">kWh</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-header">
+                  <span>DWS Water</span>
+                  <i class="fa-solid fa-faucet"></i>
+                </div>
+                <div class="metric-val">4.2</div>
+                <div class="metric-sub">kL Domestic</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-header">
+                  <span>FWS Water</span>
+                  <i class="fa-solid fa-droplet"></i>
+                </div>
+                <div class="metric-val">2.0</div>
+                <div class="metric-sub">kL Flushing</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-header">
+                  <span>BTU</span>
+                  <i class="fa-solid fa-fire-flame-curved"></i>
+                </div>
+                <div class="metric-val">142.1</div>
+                <div class="metric-sub">MWH</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Active Maintenance Tasks Section -->
+      <section>
+        <div class="section-title">
+          <span>Critical Tasks & Breakdowns</span>
+          <span style="font-size:0.75rem; color:var(--text-muted);">2 Pending</span>
+        </div>
+
+        <div class="task-card" style="background:var(--card-bg); border-radius:10px; padding:14px; border:1px solid var(--border-gold); display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <span class="tag-badge tag-pm" style="width:fit-content">PM Scheduled</span>
+            <span style="font-size:0.88rem; font-weight:600; color:var(--text-white);">AHU-04 Floor 3 Filter Cleaning</span>
+            <span style="font-size:0.74rem; color:var(--text-muted);"><i class="fa-regular fa-clock"></i> 02:00 PM | Tech: Sachin</span>
+          </div>
+          <button class="btn-gold-outline" onclick="openModule('screen-hvac', 'tab-hvac-pm')">Start</button>
+        </div>
+
+        <div class="task-card" style="background:var(--card-bg); border-radius:10px; padding:14px; border:1px solid var(--border-gold); display:flex; align-items:center; justify-content:space-between;">
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <span class="tag-badge tag-pending" style="width:fit-content">Breakdown #1024</span>
+            <span style="font-size:0.88rem; font-weight:600; color:var(--text-white);">Basement Sump Pump 2 Not Starting</span>
+            <span style="font-size:0.74rem; color:var(--text-muted);"><i class="fa-solid fa-triangle-exclamation" style="color:var(--gold-primary)"></i> High Priority</span>
+          </div>
+          <button class="btn-gold-solid" onclick="openModule('screen-plumbing', 'tab-plumb-pending')">Assign</button>
+        </div>
+      </section>
+
+    </main>
+
+
+    
+    <!-- ==================== SCREEN: READINGS ==================== -->
+    <section class="screen-view" id="screen-readings">
+      <div class="op-screen-header">
+        <button class="op-back-btn" onclick="openModule('screen-dashboard')">
+          <i class="fa-solid fa-arrow-left"></i> Dashboard
+        </button>
+        <div class="op-title-area" style="text-align:right">
+          <h2><i class="fa-solid fa-pen-nib"></i> Daily Readings</h2>
+          <p>Consumption & Feeder Logs</p>
+        </div>
+      </div>
+
+      <!-- Category Tabs for Readings -->
+      <div class="cat-tabs">
+        <button class="cat-tab-btn active" onclick="switchTab('screen-readings', 'tab-read-elec', this)">
+          <i class="fa-solid fa-bolt"></i> Electrical (kWh)
+        </button>
+        <button class="cat-tab-btn" onclick="switchTab('screen-readings', 'tab-read-water', this)">
+          <i class="fa-solid fa-droplet"></i> Water (kL)
+        </button>
+        <button class="cat-tab-btn" onclick="switchTab('screen-readings', 'tab-read-btu', this)">
+          <i class="fa-solid fa-fire-flame-curved"></i> BTU (MWH)
+        </button>
+      </div>
+
+      <!-- Tab 1: Electrical Readings -->
+      <div class="tab-content-panel active" id="tab-read-elec">
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-pm">Electrical Log Entry</span>
+            <span style="font-size:0.72rem; color:var(--gold-light);">Unit: kWh</span>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:10px; margin: 4px 0;">
+            <!-- Panel Dropdown -->
+            <div>
+              <label style="font-size:0.72rem; color:var(--text-muted); display:block; margin-bottom:3px; font-weight:600;">Panel Name</label>
+              <select id="elec-panel-select" class="cal-select" style="width:100%;" onchange="updateElecFeeders()">
+                <option value="Main Substation PMCC">Main Substation PMCC</option>
+                <option value="GHQ Main LT Panel">GHQ Main LT Panel</option>
+                <option value="Essential DG Sync Panel">Essential DG Sync Panel</option>
+                <option value="NMAEYC Floor Distribution Panel">NMAEYC Floor Distribution Panel</option>
+                <option value="HVAC Plant LT Panel">HVAC Plant LT Panel</option>
+              </select>
+            </div>
+
+            <!-- Feeder Dropdown -->
+            <div>
+              <label style="font-size:0.72rem; color:var(--text-muted); display:block; margin-bottom:3px; font-weight:600;">Feeder Name</label>
+              <select id="elec-feeder-select" class="cal-select" style="width:100%;" onchange="calculateElecConsumption()">
+                <!-- Populated via JS -->
+              </select>
+            </div>
+
+            <!-- Reading Input -->
+            <div>
+              <label style="font-size:0.72rem; color:var(--text-muted); display:block; margin-bottom:3px; font-weight:600;">Current Reading (kWh)</label>
+              <input type="number" id="elec-current-reading" placeholder="Enter current kWh reading" style="width:100%; padding:9px 10px; border-radius:8px; border:1px solid var(--border-gold); background:#0b0f19; color:#fff; font-size:0.9rem; font-weight:700;" oninput="calculateElecConsumption()">
+            </div>
+
+            <!-- Live Consumption Display Box (कालचं व आजचं काँजमशन) -->
+            <div class="reading-result-box">
+              <div class="res-title">
+                <span id="elec-display-target">Main Incomer 1</span>
+                <span class="tag-badge tag-trial">Consumption Summary</span>
+              </div>
+              <div class="reading-metric-pair">
+                <div class="read-box prev-box">
+                  <span class="r-label">Yesterday Consumption</span>
+                  <div class="r-val" id="elec-yesterday-val">4,650 <small>kWh</small></div>
+                </div>
+                <div class="read-box curr-box">
+                  <span class="r-label">Today Consumption</span>
+                  <div class="r-val" id="elec-today-val">4,820 <small>kWh</small></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-clock"></i> Auto-Calculated Difference</span>
+            <button class="btn-gold-solid" onclick="alert('Electrical Reading Saved Successfully!')">Save Electrical Reading</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Water Readings -->
+      <div class="tab-content-panel" id="tab-read-water">
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-pm">Water Flow Log Entry</span>
+            <span style="font-size:0.72rem; color:var(--cyan);">Unit: kL</span>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:10px; margin: 4px 0;">
+            <!-- Panel / Header Dropdown -->
+            <div>
+              <label style="font-size:0.72rem; color:var(--text-muted); display:block; margin-bottom:3px; font-weight:600;">Panel / Line Name</label>
+              <select id="water-panel-select" class="cal-select" style="width:100%;" onchange="updateWaterFeeders()">
+                <option value="GHQ Main Water Header">GHQ Main Water Header</option>
+                <option value="NMAEYC Sub-Header Panel">NMAEYC Sub-Header Panel</option>
+                <option value="STP / WTP Treatment Plant">STP / WTP Treatment Plant</option>
+                <option value="Cooling Tower Makeup Panel">Cooling Tower Makeup Panel</option>
+              </select>
+            </div>
+
+            <!-- Feeder / Line Dropdown -->
+            <div>
+              <label style="font-size:0.72rem; color:var(--text-muted); display:block; margin-bottom:3px; font-weight:600;">Feeder / Flow Meter</label>
+              <select id="water-feeder-select" class="cal-select" style="width:100%;" onchange="calculateWaterConsumption()">
+                <!-- Populated via JS -->
+              </select>
+            </div>
+
+            <!-- Reading Input -->
+            <div>
+              <label style="font-size:0.72rem; color:var(--text-muted); display:block; margin-bottom:3px; font-weight:600;">Current Reading (kL)</label>
+              <input type="number" id="water-current-reading" step="0.1" placeholder="Enter current kL reading" style="width:100%; padding:9px 10px; border-radius:8px; border:1px solid var(--border-gold); background:#0b0f19; color:#fff; font-size:0.9rem; font-weight:700;" oninput="calculateWaterConsumption()">
+            </div>
+
+            <!-- Live Consumption Display Box (कालचं व आजचं काँजमशन) -->
+            <div class="reading-result-box">
+              <div class="res-title">
+                <span id="water-display-target">DWS Domestic Water</span>
+                <span class="tag-badge tag-trial">Water Consumption</span>
+              </div>
+              <div class="reading-metric-pair">
+                <div class="read-box prev-box">
+                  <span class="r-label">Yesterday Consumption</span>
+                  <div class="r-val" id="water-yesterday-val">11.8 <small>kL</small></div>
+                </div>
+                <div class="read-box curr-box">
+                  <span class="r-label">Today Consumption</span>
+                  <div class="r-val" id="water-today-val">12.4 <small>kL</small></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-clock"></i> Meter Flow Verified</span>
+            <button class="btn-gold-solid" onclick="alert('Water Reading Saved Successfully!')">Save Water Reading</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: BTU Readings -->
+      <div class="tab-content-panel" id="tab-read-btu">
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-pm">BTU Energy Log Entry</span>
+            <span style="font-size:0.72rem; color:var(--gold-primary);">Unit: MWH</span>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:10px; margin: 4px 0;">
+            <!-- Panel / Header Dropdown -->
+            <div>
+              <label style="font-size:0.72rem; color:var(--text-muted); display:block; margin-bottom:3px; font-weight:600;">Panel / Central Plant</label>
+              <select id="btu-panel-select" class="cal-select" style="width:100%;" onchange="updateBtuFeeders()">
+                <option value="Central Chiller Plant Header">Central Chiller Plant Header</option>
+                <option value="GHQ Office Tower BTU Panel">GHQ Office Tower BTU Panel</option>
+                <option value="NMAEYC BTU Meter Panel">NMAEYC BTU Meter Panel</option>
+                <option value="Server PAC Chilled Loop">Server PAC Chilled Loop</option>
+              </select>
+            </div>
+
+            <!-- Feeder Dropdown -->
+            <div>
+              <label style="font-size:0.72rem; color:var(--text-muted); display:block; margin-bottom:3px; font-weight:600;">Feeder / Area Line</label>
+              <select id="btu-feeder-select" class="cal-select" style="width:100%;" onchange="calculateBtuConsumption()">
+                <!-- Populated via JS -->
+              </select>
+            </div>
+
+            <!-- Reading Input -->
+            <div>
+              <label style="font-size:0.72rem; color:var(--text-muted); display:block; margin-bottom:3px; font-weight:600;">Current Reading (MWH)</label>
+              <input type="number" id="btu-current-reading" step="0.1" placeholder="Enter current MWH reading" style="width:100%; padding:9px 10px; border-radius:8px; border:1px solid var(--border-gold); background:#0b0f19; color:#fff; font-size:0.9rem; font-weight:700;" oninput="calculateBtuConsumption()">
+            </div>
+
+            <!-- Live Consumption Display Box (कालचं व आजचं काँजमशन) -->
+            <div class="reading-result-box">
+              <div class="res-title">
+                <span id="btu-display-target">Chiller 01 BTU Line</span>
+                <span class="tag-badge tag-trial">Thermal Consumption</span>
+              </div>
+              <div class="reading-metric-pair">
+                <div class="read-box prev-box">
+                  <span class="r-label">Yesterday Consumption</span>
+                  <div class="r-val" id="btu-yesterday-val">358.0 <small>MWH</small></div>
+                </div>
+                <div class="read-box curr-box">
+                  <span class="r-label">Today Consumption</span>
+                  <div class="r-val" id="btu-today-val">363.4 <small>MWH</small></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-clock"></i> Delta T & Energy Logged</span>
+            <button class="btn-gold-solid" onclick="alert('BTU Reading Saved Successfully!')">Save BTU Reading</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SCREEN: PPM ==================== -->
+    <section class="screen-view" id="screen-ppm">
+      <div class="op-screen-header">
+        <button class="op-back-btn" onclick="openModule('screen-dashboard')">
+          <i class="fa-solid fa-arrow-left"></i> Dashboard
+        </button>
+        <div class="op-title-area" style="text-align:right">
+          <h2><i class="fa-solid fa-calendar-days"></i> PPM Calendar</h2>
+          <p>Preventive Maintenance Schedules</p>
+        </div>
+      </div>
+
+      <!-- Interactive Monthly Calendar Card -->
+      <div class="ppm-calendar-card">
+        <!-- Month and Year Dropdowns -->
+        <div class="cal-controls">
+          <button class="cal-nav-btn" onclick="changeMonth(-1)" title="Previous Month">
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+          <div class="cal-select-group">
+            <select id="cal-month-select" class="cal-select" onchange="onDateSelectionChange()">
+              <option value="0">January</option>
+              <option value="1">February</option>
+              <option value="2">March</option>
+              <option value="3">April</option>
+              <option value="4">May</option>
+              <option value="5">June</option>
+              <option value="6">July</option>
+              <option value="7">August</option>
+              <option value="8">September</option>
+              <option value="9">October</option>
+              <option value="10" selected>November</option>
+              <option value="11">December</option>
+            </select>
+            <select id="cal-year-select" class="cal-select" onchange="onDateSelectionChange()">
+              <option value="2024">2024</option>
+              <option value="2025">2025</option>
+              <option value="2026" selected>2026</option>
+              <option value="2027">2027</option>
+              <option value="2028">2028</option>
+              <option value="2029">2029</option>
+              <option value="2030">2030</option>
+            </select>
+          </div>
+          <button class="cal-nav-btn" onclick="changeMonth(1)" title="Next Month">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+
+        <!-- Weekdays Header (वार) -->
+        <div class="cal-weekdays">
+          <span class="sun">Sun</span>
+          <span>Mon</span>
+          <span>Tue</span>
+          <span>Wed</span>
+          <span>Thu</span>
+          <span>Fri</span>
+          <span>Sat</span>
+        </div>
+
+        <!-- Calendar Dates Grid (तारीख) -->
+        <div class="cal-grid" id="cal-days-grid">
+          <!-- Dynamically populated via JS -->
+        </div>
+
+        <!-- Legend -->
+        <div class="cal-legend">
+          <div class="legend-item"><span class="cal-dot dot-elec"></span> Electrical</div>
+          <div class="legend-item"><span class="cal-dot dot-hvac"></span> HVAC</div>
+          <div class="legend-item"><span class="cal-dot dot-plumb"></span> Plumbing</div>
+        </div>
+
+<!-- Selected Date Status Banner -->
+        <div class="selected-date-banner" id="cal-selected-banner">
+          <div><i class="fa-regular fa-calendar-check" style="color:var(--gold-primary)"></i> <span id="banner-date-text">Selected: Monday, 02 Nov 2026</span></div>
+          <span class="tag-badge tag-pm" id="banner-task-count">2 Tasks Due</span>
+        </div>
+
+                <!-- Monthly PPM Total Summary Box -->
+        <div class="cal-month-summary-box">
+          <div class="month-sum-main">
+            <div class="month-sum-title">
+              <i class="fa-solid fa-list-check" style="color:var(--gold-primary)"></i>
+              <span>Total Monthly PPM</span>
+            </div>
+            <div class="month-sum-val" id="total-monthly-ppm">14 Tasks</div>
+          </div>
+          
+          <div class="month-sum-table">
+            <div class="sum-row-header">
+              <span>Department</span>
+              <span>Total</span>
+              <span>Complete</span>
+              <span>Pending</span>
+            </div>
+            
+            <div class="sum-row">
+              <div class="dept-col"><span class="sum-dot dot-elec"></span> Electrical</div>
+              <span class="sum-badge total-badge" id="total-elec-ppm">5</span>
+              <span class="sum-badge comp-badge" id="comp-elec-ppm">3</span>
+              <span class="sum-badge pend-badge" id="pend-elec-ppm">2</span>
+            </div>
+
+            <div class="sum-row">
+              <div class="dept-col"><span class="sum-dot dot-hvac"></span> HVAC</div>
+              <span class="sum-badge total-badge" id="total-hvac-ppm">5</span>
+              <span class="sum-badge comp-badge" id="comp-hvac-ppm">4</span>
+              <span class="sum-badge pend-badge" id="pend-hvac-ppm">1</span>
+            </div>
+
+            <div class="sum-row">
+              <div class="dept-col"><span class="sum-dot dot-plumb"></span> Plumbing</div>
+              <span class="sum-badge total-badge" id="total-plumb-ppm">4</span>
+              <span class="sum-badge comp-badge" id="comp-plumb-ppm">2</span>
+              <span class="sum-badge pend-badge" id="pend-plumb-ppm">2</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Category Filter Tabs for PPM Tasks -->
+      <div class="cat-tabs">
+        <button class="cat-tab-btn active" onclick="switchTab('screen-ppm', 'tab-ppm-elec', this)">
+          <i class="fa-solid fa-bolt"></i> Electrical
+        </button>
+        <button class="cat-tab-btn" onclick="switchTab('screen-ppm', 'tab-ppm-hvac', this)">
+          <i class="fa-solid fa-snowflake"></i> HVAC
+        </button>
+        <button class="cat-tab-btn" onclick="switchTab('screen-ppm', 'tab-ppm-plumb', this)">
+          <i class="fa-solid fa-faucet-drip"></i> Plumbing
+        </button>
+      </div>
+
+      <!-- Tab 1: Electrical PPM -->
+      <div class="tab-content-panel active" id="tab-ppm-elec">
+        <div class="section-title">
+          <span>Electrical PM Schedules</span>
+          <span style="font-size:0.72rem; color:var(--cyan)">Substation & Panels</span>
+        </div>
+
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-pm">Quarterly PM</span>
+            <span style="font-size:0.72rem; color:var(--gold-light);">Due: Tomorrow</span>
+          </div>
+          <div class="op-item-title">11kV HT VCB & Transformer TR-01 Servicing</div>
+          <div class="op-item-desc">Insulation resistance test, contact resistance check, trip test, silica gel condition check, and busbar torque checking.</div>
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-user-gear"></i> Assigned: Senior Tech Rajesh</span>
+            <button class="btn-gold-solid">Execute PM</button>
+          </div>
+        </div>
+
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-pm">Monthly PM</span>
+            <span style="font-size:0.72rem; color:var(--text-muted);">Due: In 5 Days</span>
+          </div>
+          <div class="op-item-title">Main LT Switchgear Panel & ACB PM</div>
+          <div class="op-item-desc">Dust blowing, terminal tightening, ACB racking mechanism lubrication, micro-processor release trip test.</div>
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-user-gear"></i> Assigned: Tech Anil</span>
+            <button class="btn-gold-outline">Checklist</button>
+          </div>
+        </div>
+
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-pm">Monthly PM</span>
+            <span style="font-size:0.72rem; color:var(--text-muted);">Due: In 8 Days</span>
+          </div>
+          <div class="op-item-title">Substation Earthing Pit Resistance Testing</div>
+          <div class="op-item-desc">Value measurement for 12 Earth Pits across ERT Substation using Earth Megger. Maintain below 1.0 Ohm.</div>
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-user-gear"></i> Assigned: Tech Sunil</span>
+            <button class="btn-gold-outline">Checklist</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: HVAC PPM -->
+      <div class="tab-content-panel" id="tab-ppm-hvac">
+        <div class="section-title">
+          <span>HVAC PM Schedules</span>
+          <span style="font-size:0.72rem; color:var(--cyan)">Plant & Air Handlers</span>
+        </div>
+
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-pm">Fortnightly PM</span>
+            <span style="font-size:0.72rem; color:var(--gold-light);">Due: Today 02:00 PM</span>
+          </div>
+          <div class="op-item-title">AHU-01 to AHU-06 Pre-Filter Cleaning & Belt Tension</div>
+          <div class="op-item-desc">Washing 10-micron air filters, checking blower belt alignment, drive pulley tight checks, and motor bearing lubrication.</div>
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-user-gear"></i> Assigned: Tech Sachin & Vijay</span>
+            <button class="btn-gold-solid">Execute PM</button>
+          </div>
+        </div>
+
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-pm">Monthly PM</span>
+            <span style="font-size:0.72rem; color:var(--text-muted);">Due: In 4 Days</span>
+          </div>
+          <div class="op-item-title">Chiller-01 (400 TR Water Cooled) Safety Interlocks</div>
+          <div class="op-item-desc">Verification of chilled water flow switch, condenser pressure transducer calibration, oil heater status, and refrigerant level.</div>
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-handshake"></i> Vendor AMC: Johnson Controls</span>
+            <button class="btn-gold-outline">Checklist</button>
+          </div>
+        </div>
+
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-pm">Weekly PM</span>
+            <span style="font-size:0.72rem; color:var(--text-muted);">Due: Friday</span>
+          </div>
+          <div class="op-item-title">Cooling Tower CT-01 & CT-02 Basin Cleaning & Dosing</div>
+          <div class="op-item-desc">Sludge de-silting, fan pitch check, biocide and anti-scalant chemical dosing level verification.</div>
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-user-gear"></i> Assigned: Tech Santosh</span>
+            <button class="btn-gold-outline">Checklist</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Plumbing PPM -->
+      <div class="tab-content-panel" id="tab-ppm-plumb">
+        <div class="section-title">
+          <span>Plumbing PM Schedules</span>
+          <span style="font-size:0.72rem; color:var(--cyan)">Pumps & STP/WTP</span>
+        </div>
+
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-pm">Monthly PM</span>
+            <span style="font-size:0.72rem; color:var(--gold-light);">Due: In 2 Days</span>
+          </div>
+          <div class="op-item-title">Hydro-Pneumatic (HYPN) Booster Pumps 1 & 2 Servicing</div>
+          <div class="op-item-desc">Pressure vessel diaphragm air charge check (maintained at 3.5 bar), mechanical seal leakage inspection, check valve operation.</div>
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-user-gear"></i> Assigned: Tech Ganesh</span>
+            <button class="btn-gold-solid">Execute PM</button>
+          </div>
+        </div>
+
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-pm">Monthly PM</span>
+            <span style="font-size:0.72rem; color:var(--text-muted);">Due: In 6 Days</span>
+          </div>
+          <div class="op-item-title">STP Aeration Tank Roots Blowers PM</div>
+          <div class="op-item-desc">Gear oil replacement, air intake filter cleaning, V-belt tension, dissolved oxygen (DO) sensor calibration.</div>
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-user-gear"></i> Assigned: Tech Santosh</span>
+            <button class="btn-gold-outline">Checklist</button>
+          </div>
+        </div>
+
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-pm">Quarterly PM</span>
+            <span style="font-size:0.72rem; color:var(--text-muted);">Due: In 10 Days</span>
+          </div>
+          <div class="op-item-title">Domestic & Flushing Underground Tanks (UGT) Chlorination</div>
+          <div class="op-item-desc">Water quality lab testing for TDS, hardness, residual chlorine, and E-Coli count according to IS 10500 standards.</div>
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-vial"></i> Quality Audit Compliance</span>
+            <button class="btn-gold-outline">Test Sheet</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SCREEN: REPORTS (DSR / WSR / MMR) ==================== -->
+    <section class="screen-view" id="screen-reports">
+      <div class="op-screen-header">
+        <button class="op-back-btn" onclick="openModule('screen-dashboard')">
+          <i class="fa-solid fa-arrow-left"></i> Dashboard
+        </button>
+        <div class="op-title-area" style="text-align:right">
+          <h2><i class="fa-solid fa-file-contract"></i> O&M Reports</h2>
+          <p>DSR, WSR & MMR Exports</p>
+        </div>
+      </div>
+
+      <!-- Category Tabs for Reports -->
+      <div class="cat-tabs">
+        <button class="cat-tab-btn active" onclick="switchTab('screen-reports', 'tab-rep-dsr', this)">
+          <i class="fa-solid fa-file-lines"></i> 1. DSR
+        </button>
+        <button class="cat-tab-btn" onclick="switchTab('screen-reports', 'tab-rep-wsr', this)">
+          <i class="fa-solid fa-file-waveform"></i> 2. WSR
+        </button>
+        <button class="cat-tab-btn" onclick="switchTab('screen-reports', 'tab-rep-mmr', this)">
+          <i class="fa-solid fa-file-shield"></i> 3. MMR
+        </button>
+      </div>
+
+      <!-- ==================== TAB 1: DSR ==================== -->
+      <div class="tab-content-panel active" id="tab-rep-dsr">
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-pm">Daily Status Report</span>
+            <span style="font-size:0.72rem; color:var(--gold-light);">Daily O&M Summary</span>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:12px; margin: 4px 0;">
+            <!-- Date Selector -->
+            <div>
+              <label style="font-size:0.72rem; color:var(--text-muted); display:block; margin-bottom:4px; font-weight:600;">Select Report Date</label>
+              <input type="date" id="dsr-date-input" value="2026-11-03" class="cal-select" style="width:100%; padding:9px 12px; font-size:0.85rem;">
+            </div>
+
+            <!-- Report Live Preview Snapshot -->
+            <div class="report-preview-box">
+              <div class="rep-preview-header">
+                <span><i class="fa-solid fa-chart-simple" style="color:var(--gold-primary)"></i> DSR Executive Summary</span>
+                <span class="tag-badge tag-trial">Ready to Export</span>
+              </div>
+              <div class="rep-preview-grid">
+                <div class="rep-stat-item">
+                  <span class="stat-lbl">Electrical Incomer</span>
+                  <span class="stat-val">4,820 kWh</span>
+                </div>
+                <div class="rep-stat-item">
+                  <span class="stat-lbl">Water (DWS / FWS)</span>
+                  <span class="stat-val">12.4 / 6.1 kL</span>
+                </div>
+                <div class="rep-stat-item">
+                  <span class="stat-lbl">Cooling Thermal (BTU)</span>
+                  <span class="stat-val">363.4 MWH</span>
+                </div>
+                <div class="rep-stat-item">
+                  <span class="stat-lbl">PPM Tasks Executed</span>
+                  <span class="stat-val" style="color:#34d399">2 Done / 0 Pending</span>
+                </div>
+                <div class="rep-stat-item">
+                  <span class="stat-lbl">Breakdown Status</span>
+                  <span class="stat-val" style="color:#f87171">1 Closed / 1 In-Prog</span>
+                </div>
+                <div class="rep-stat-item">
+                  <span class="stat-lbl">DG Backup Status</span>
+                  <span class="stat-val">Healthy (82% Fuel)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Download Buttons (Generate PDF / Excel) -->
+            <div class="export-actions-group">
+              <button class="btn-export-pdf" onclick="generateReport('Daily Status Report (DSR)', 'PDF')">
+                <i class="fa-solid fa-file-pdf"></i> Generate PDF
+              </button>
+              <button class="btn-export-excel" onclick="generateReport('Daily Status Report (DSR)', 'Excel (.xlsx)')">
+                <i class="fa-solid fa-file-excel"></i> Generate Excel File
+              </button>
+            </div>
+          </div>
+
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-clock"></i> Generated by Facility Supervisor</span>
+            <span style="color:var(--gold-primary); font-weight:600;"><i class="fa-solid fa-circle-check"></i> Standard Format</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== TAB 2: WSR ==================== -->
+      <div class="tab-content-panel" id="tab-rep-wsr">
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-major">Weekly Status Report</span>
+            <span style="font-size:0.72rem; color:var(--cyan);">Week 44 (2026)</span>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:12px; margin: 4px 0;">
+            <!-- Week Selection -->
+            <div>
+              <label style="font-size:0.72rem; color:var(--text-muted); display:block; margin-bottom:4px; font-weight:600;">Select Week Range</label>
+              <select id="wsr-week-select" class="cal-select" style="width:100%; padding:9px 12px; font-size:0.85rem;">
+                <option value="w1" selected>Current Week: 27 Oct 2026 – 02 Nov 2026</option>
+                <option value="w2">Previous Week: 20 Oct 2026 – 26 Oct 2026</option>
+                <option value="w3">Week 42: 13 Oct 2026 – 19 Oct 2026</option>
+                <option value="w4">Week 41: 06 Oct 2026 – 12 Oct 2026</option>
+              </select>
+            </div>
+
+            <!-- Report Live Preview Snapshot -->
+            <div class="report-preview-box">
+              <div class="rep-preview-header">
+                <span><i class="fa-solid fa-chart-line" style="color:var(--gold-primary)"></i> WSR Operations Highlights</span>
+                <span class="tag-badge tag-trial">Weekly Trends</span>
+              </div>
+              <div class="rep-preview-grid">
+                <div class="rep-stat-item">
+                  <span class="stat-lbl">7-Day Power Consumption</span>
+                  <span class="stat-val">32,840 kWh</span>
+                </div>
+                <div class="rep-stat-item">
+                  <span class="stat-lbl">Total Water Consumption</span>
+                  <span class="stat-val">128.5 kL</span>
+                </div>
+                <div class="rep-stat-item">
+                  <span class="stat-lbl">Average Power Factor (PF)</span>
+                  <span class="stat-val" style="color:#34d399">0.99 (Healthy)</span>
+                </div>
+                <div class="rep-stat-item">
+                  <span class="stat-lbl">Weekly PPM Compliance</span>
+                  <span class="stat-val">94.2% Completed</span>
+                </div>
+                <div class="rep-stat-item">
+                  <span class="stat-lbl">DG Load Trial Result</span>
+                  <span class="stat-val" style="color:#34d399">Passed (45 Mins Run)</span>
+                </div>
+                <div class="rep-stat-item">
+                  <span class="stat-lbl">Total Breakdowns Raised</span>
+                  <span class="stat-val">4 Resolved / 1 Pending</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Download Buttons (Generate PDF / Excel) -->
+            <div class="export-actions-group">
+              <button class="btn-export-pdf" onclick="generateReport('Weekly Status Report (WSR)', 'PDF')">
+                <i class="fa-solid fa-file-pdf"></i> Generate PDF
+              </button>
+              <button class="btn-export-excel" onclick="generateReport('Weekly Status Report (WSR)', 'Excel (.xlsx)')">
+                <i class="fa-solid fa-file-excel"></i> Generate Excel File
+              </button>
+            </div>
+          </div>
+
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-user-tie"></i> Reviewed by O&M Manager</span>
+            <span style="color:var(--cyan); font-weight:600;"><i class="fa-solid fa-file-arrow-down"></i> Weekly Archive</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== TAB 3: MMR ==================== -->
+      <div class="tab-content-panel" id="tab-rep-mmr">
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-pm">Monthly Management Report</span>
+            <span style="font-size:0.72rem; color:var(--gold-light);">Executive Deck</span>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:12px; margin: 4px 0;">
+            <!-- Month Selection -->
+            <div style="display:grid; grid-template-columns: 2fr 1fr; gap:8px;">
+              <div>
+                <label style="font-size:0.72rem; color:var(--text-muted); display:block; margin-bottom:4px; font-weight:600;">Select Month</label>
+                <select id="mmr-month-select" class="cal-select" style="width:100%; padding:9px 12px; font-size:0.85rem;">
+                  <option value="10" selected>November (Current Month)</option>
+                  <option value="9">October 2026</option>
+                  <option value="8">September 2026</option>
+                  <option value="7">August 2026</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:0.72rem; color:var(--text-muted); display:block; margin-bottom:4px; font-weight:600;">Year</label>
+                <select id="mmr-year-select" class="cal-select" style="width:100%; padding:9px 12px; font-size:0.85rem;">
+                  <option value="2026" selected>2026</option>
+                  <option value="2025">2025</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Report Live Preview Snapshot -->
+            <div class="report-preview-box">
+              <div class="rep-preview-header">
+                <span><i class="fa-solid fa-building-columns" style="color:var(--gold-primary)"></i> MMR Management Dashboard</span>
+                <span class="tag-badge tag-trial">Capex & Opex</span>
+              </div>
+              <div class="rep-preview-grid">
+                <div class="rep-stat-item">
+                  <span class="stat-lbl">Monthly Power Bill Estimate</span>
+                  <span class="stat-val">₹ 14.85 Lakhs</span>
+                </div>
+                <div class="rep-stat-item">
+                  <span class="stat-lbl">Monthly Specific Energy</span>
+                  <span class="stat-val">142,500 kWh</span>
+                </div>
+                <div class="rep-stat-item">
+                  <span class="stat-lbl">Total PPM Adherence</span>
+                  <span class="stat-val" style="color:#34d399">96.8% (IS Standards)</span>
+                </div>
+                <div class="rep-stat-item">
+                  <span class="stat-lbl">Capex & Major Overhauls</span>
+                  <span class="stat-val">2 Projects Active</span>
+                </div>
+                <div class="rep-stat-item">
+                  <span class="stat-lbl">Statutory Compliance (NOC)</span>
+                  <span class="stat-val" style="color:#34d399">100% Up to Date</span>
+                </div>
+                <div class="rep-stat-item">
+                  <span class="stat-lbl">Spares & Inventory Spend</span>
+                  <span class="stat-val">₹ 1.42 Lakhs</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Download Buttons (Generate PDF / Excel) -->
+            <div class="export-actions-group">
+              <button class="btn-export-pdf" onclick="generateReport('Monthly Management Report (MMR)', 'PDF')">
+                <i class="fa-solid fa-file-pdf"></i> Generate PDF
+              </button>
+              <button class="btn-export-excel" onclick="generateReport('Monthly Management Report (MMR)', 'Excel (.xlsx)')">
+                <i class="fa-solid fa-file-excel"></i> Generate Excel File
+              </button>
+            </div>
+          </div>
+
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-stamp"></i> Head of Facilities Signoff</span>
+            <span style="color:var(--gold-primary); font-weight:600;"><i class="fa-solid fa-award"></i> Executive Quality</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SCREEN: ASSET MANAGEMENT ==================== -->
+    <section class="screen-view" id="screen-assets">
+      <div class="op-screen-header">
+        <button class="op-back-btn" onclick="openModule('screen-dashboard')">
+          <i class="fa-solid fa-arrow-left"></i> Dashboard
+        </button>
+        <div class="op-title-area" style="text-align:right">
+          <h2><i class="fa-solid fa-cubes"></i> Asset Master</h2>
+          <p>GHQ Building Engineering Assets</p>
+        </div>
+      </div>
+
+      <!-- Main Asset Category Selection View -->
+      <div id="assets-category-view" style="display:flex; flex-direction:column; gap:12px;">
+        <div class="section-title">
+          <span>Asset Categories</span>
+          <span style="font-size:0.72rem; color:var(--gold-primary)">Total 81 Assets</span>
+        </div>
+
+        <!-- Electrical Asset Card -->
+        <div class="asset-cat-card" onclick="openAssetSheet('elec')">
+          <div class="asset-cat-left">
+            <div class="asset-icon-box" style="color:var(--cyan); border-color:rgba(56, 189, 248, 0.4); background:rgba(56, 189, 248, 0.12);">
+              <i class="fa-solid fa-bolt"></i>
+            </div>
+            <div class="asset-cat-info">
+              <h3>Electrical Assets</h3>
+              <p>Transformers, HT/LT Panels, DG, UPS</p>
+            </div>
+          </div>
+          <div class="asset-cat-right">
+            <span class="asset-count-badge">24</span>
+            <i class="fa-solid fa-chevron-right" style="color:var(--gold-primary); font-size:0.85rem;"></i>
+          </div>
+        </div>
+
+        <!-- HVAC Asset Card -->
+        <div class="asset-cat-card" onclick="openAssetSheet('hvac')">
+          <div class="asset-cat-left">
+            <div class="asset-icon-box" style="color:#34d399; border-color:rgba(52, 211, 153, 0.4); background:rgba(52, 211, 153, 0.12);">
+              <i class="fa-solid fa-snowflake"></i>
+            </div>
+            <div class="asset-cat-info">
+              <h3>HVAC Assets</h3>
+              <p>Chillers, Cooling Towers, AHUs, Pumps</p>
+            </div>
+          </div>
+          <div class="asset-cat-right">
+            <span class="asset-count-badge">38</span>
+            <i class="fa-solid fa-chevron-right" style="color:var(--gold-primary); font-size:0.85rem;"></i>
+          </div>
+        </div>
+
+        <!-- Plumbing Asset Card -->
+        <div class="asset-cat-card" onclick="openAssetSheet('plumb')">
+          <div class="asset-cat-left">
+            <div class="asset-icon-box" style="color:#fbbf24; border-color:rgba(251, 191, 36, 0.4); background:rgba(251, 191, 36, 0.12);">
+              <i class="fa-solid fa-faucet-drip"></i>
+            </div>
+            <div class="asset-cat-info">
+              <h3>Plumbing Assets</h3>
+              <p>HYPN Pumps, STP Blowers, Sump Pumps</p>
+            </div>
+          </div>
+          <div class="asset-cat-right">
+            <span class="asset-count-badge">19</span>
+            <i class="fa-solid fa-chevron-right" style="color:var(--gold-primary); font-size:0.85rem;"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detailed Asset Sheet (उघडणारी पूर्ण शीट) -->
+      <div id="assets-sheet-view" style="display:none; flex-direction:column; gap:12px;">
+        <div class="sheet-top-nav">
+          <button class="sheet-back-btn" onclick="backToAssetCategories()">
+            <i class="fa-solid fa-arrow-left"></i> All Categories
+          </button>
+          <div class="sheet-header-title">
+            <h3 id="sheet-title-text">HVAC Assets Sheet</h3>
+            <span id="sheet-badge-text" class="tag-badge tag-trial">38 Assets</span>
+          </div>
+        </div>
+
+        <!-- Search bar inside Asset Sheet -->
+        <div style="position:relative;">
+          <i class="fa-solid fa-magnifying-glass" style="position:absolute; left:12px; top:12px; color:var(--text-muted); font-size:0.8rem;"></i>
+          <input type="text" id="asset-search-input" placeholder="Search by Tag No, Name or Floor..." oninput="filterAssetSheet()" class="cal-select" style="width:100%; padding:9px 12px 9px 34px; font-size:0.82rem;">
+        </div>
+
+        <!-- Dynamic Asset Table / Cards Container -->
+        <div id="asset-items-container" style="display:flex; flex-direction:column; gap:8px;">
+          <!-- Dynamically populated via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SCREEN 2: ELECTRICAL ==================== -->
+    <section class="screen-view" id="screen-electrical">
+      <div class="op-screen-header">
+        <button class="op-back-btn" onclick="openModule('screen-dashboard')">
+          <i class="fa-solid fa-arrow-left"></i> Dashboard
+        </button>
+        <div class="op-title-area" style="text-align:right">
+          <h2><i class="fa-solid fa-bolt"></i> Electrical</h2>
+          <p>Substation & Power Operations</p>
+        </div>
+      </div>
+
+      <!-- 3 Sub Categories -->
+      <div class="cat-tabs">
+        <button class="cat-tab-btn active" onclick="switchTab('screen-electrical', 'tab-elec-pm', this)">
+          <i class="fa-solid fa-calendar-check"></i> 1. PM Schedule
+        </button>
+        <button class="cat-tab-btn" onclick="switchTab('screen-electrical', 'tab-elec-major', this)">
+          <i class="fa-solid fa-screwdriver-wrench"></i> 2. Major Work
+        </button>
+        <button class="cat-tab-btn" onclick="switchTab('screen-electrical', 'tab-elec-pending', this)">
+          <i class="fa-solid fa-clock-rotate-left"></i> 3. Pending Work
+        </button>
+      </div>
+
+      <!-- Tab 1: PM Schedule -->
+      <div class="tab-content-panel active" id="tab-elec-pm">
+        <div class="section-title">
+          <span>Scheduled Electrical PM</span>
+          <span style="font-size:0.72rem; color:var(--cyan)">Monthly / Quarterly</span>
+        </div>
+
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-pm">Quarterly PM</span>
+            <span style="font-size:0.72rem; color:var(--gold-light);">Due: Tomorrow</span>
+          </div>
+          <div class="op-item-title">11kV HT VCB & Transformer TR-01 Servicing</div>
+          <div class="op-item-desc">Insulation resistance test, contact resistance check, trip test, silica gel condition check, and busbar torque checking.</div>
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-user-gear"></i> Assigned: Senior Tech Rajesh</span>
+            <button class="btn-gold-solid">Execute PM</button>
+          </div>
+        </div>
+
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-pm">Monthly PM</span>
+            <span style="font-size:0.72rem; color:var(--text-muted);">Due: In 5 Days</span>
+          </div>
+          <div class="op-item-title">Main LT Switchgear Panel & ACB PM</div>
+          <div class="op-item-desc">Dust blowing, terminal tightening, ACB racking mechanism lubrication, micro-processor release trip test.</div>
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-user-gear"></i> Assigned: Tech Anil</span>
+            <button class="btn-gold-outline">Checklist</button>
+          </div>
+        </div>
+
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-pm">Monthly PM</span>
+            <span style="font-size:0.72rem; color:var(--text-muted);">Due: In 8 Days</span>
+          </div>
+          <div class="op-item-title">Substation Earthing Pit Resistance Testing</div>
+          <div class="op-item-desc">Value measurement for 12 Earth Pits across ERT Substation using Earth Megger. Maintain below 1.0 Ohm.</div>
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-user-gear"></i> Assigned: Tech Sunil</span>
+            <button class="btn-gold-outline">Checklist</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Major Work -->
+      <div class="tab-content-panel" id="tab-elec-major">
+        <div class="section-title">
+          <span>Major Overhauls & Projects</span>
+          <span style="font-size:0.72rem; color:var(--gold-primary)">Capex & AMC</span>
+        </div>
+
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-major">Major Overhaul</span>
+            <span style="font-size:0.72rem; color:var(--gold-light);">Phase 2 Active</span>
+          </div>
+          <div class="op-item-title">1500 kVA Transformer Oil Filtration & BDV Testing</div>
+          <div class="op-item-desc">Complete dehydration and oil degasification via high vacuum filtration machine. Target BDV value &gt; 65 kV. Scheduled during weekend shutdown.</div>
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-handshake"></i> Vendor: PowerTech Engineers</span>
+            <button class="btn-gold-solid">Project Status</button>
+          </div>
+        </div>
+
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-major">Capex Project</span>
+            <span style="font-size:0.72rem; color:var(--text-muted);">Approved PO #7821</span>
+          </div>
+          <div class="op-item-title">APFC Capacitor Bank 400 kVAR Replacement</div>
+          <div class="op-item-desc">Upgrading aged capacitor steps and detuned reactors to maintain building power factor at unity (0.99) and eliminate MD penalty.</div>
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-file-invoice-dollar"></i> Capex: INR 3.85 Lakhs</span>
+            <button class="btn-gold-outline">Track PO</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Pending Work -->
+      <div class="tab-content-panel" id="tab-elec-pending">
+        <div class="section-title">
+          <span>Pending Complaints & Snags</span>
+          <span style="font-size:0.72rem; color:var(--danger)">2 Pending</span>
+        </div>
+
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-pending">Pending Snag</span>
+            <span style="font-size:0.72rem; color:var(--danger)">Aging: 2 Days</span>
+          </div>
+          <div class="op-item-title">Floor 4 Distribution Board DB-4A R-Phase CBCT Tripping</div>
+          <div class="op-item-desc">Earth Leakage Relay (ELR) intermittent tripping observed during evening peak load. Megger testing of outgoing cable pending.</div>
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-user-clock"></i> In-charge: Tech Sachin</span>
+            <button class="btn-gold-solid">Resolve Snag</button>
+          </div>
+        </div>
+
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-pending">Spares Awaited</span>
+            <span style="font-size:0.72rem; color:var(--amber)">Pending Part</span>
+          </div>
+          <div class="op-item-title">UPS-02 Static Bypass SCR Contactor Replacement</div>
+          <div class="op-item-desc">Auxiliary contactor sticking issue. Part PO issued to Schneider Electric. Delivery expected by Wednesday.</div>
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-boxes-packing"></i> Part ETA: 4th Nov</span>
+            <button class="btn-gold-outline">View Ticket</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ==================== SCREEN 3: HVAC ==================== -->
+    <section class="screen-view" id="screen-hvac">
+      <div class="op-screen-header">
+        <button class="op-back-btn" onclick="openModule('screen-dashboard')">
+          <i class="fa-solid fa-arrow-left"></i> Dashboard
+        </button>
+        <div class="op-title-area" style="text-align:right">
+          <h2><i class="fa-solid fa-snowflake"></i> HVAC</h2>
+          <p>Chiller Plant & Air Distribution</p>
+        </div>
+      </div>
+
+      <!-- 3 Sub Categories -->
+      <div class="cat-tabs">
+        <button class="cat-tab-btn active" onclick="switchTab('screen-hvac', 'tab-hvac-pm', this)">
+          <i class="fa-solid fa-calendar-check"></i> 1. PM Schedule
+        </button>
+        <button class="cat-tab-btn" onclick="switchTab('screen-hvac', 'tab-hvac-major', this)">
+          <i class="fa-solid fa-screwdriver-wrench"></i> 2. Major Work
+        </button>
+        <button class="cat-tab-btn" onclick="switchTab('screen-hvac', 'tab-hvac-pending', this)">
+          <i class="fa-solid fa-clock-rotate-left"></i> 3. Pending Work
+        </button>
+      </div>
+
+      <!-- Tab 1: PM Schedule -->
+      <div class="tab-content-panel active" id="tab-hvac-pm">
+        <div class="section-title">
+          <span>Scheduled HVAC PM</span>
+          <span style="font-size:0.72rem; color:var(--cyan)">Weekly / Monthly</span>
+        </div>
+
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-pm">Fortnightly PM</span>
+            <span style="font-size:0.72rem; color:var(--gold-light);">Due: Today 02:00 PM</span>
+          </div>
+          <div class="op-item-title">AHU-01 to AHU-06 Pre-Filter Cleaning & Belt Tension</div>
+          <div class="op-item-desc">Washing 10-micron air filters, checking blower belt alignment, drive pulley tight checks, and motor bearing lubrication.</div>
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-user-gear"></i> Assigned: Tech Sachin & Vijay</span>
+            <button class="btn-gold-solid">Execute PM</button>
+          </div>
+        </div>
+
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-pm">Monthly PM</span>
+            <span style="font-size:0.72rem; color:var(--text-muted);">Due: In 4 Days</span>
+          </div>
+          <div class="op-item-title">Chiller-01 (400 TR Water Cooled) Safety Interlocks</div>
+          <div class="op-item-desc">Verification of chilled water flow switch, condenser pressure transducer calibration, oil heater status, and refrigerant level.</div>
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-handshake"></i> Vendor AMC: Johnson Controls</span>
+            <button class="btn-gold-outline">Checklist</button>
+          </div>
+        </div>
+
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-pm">Weekly PM</span>
+            <span style="font-size:0.72rem; color:var(--text-muted);">Due: Friday</span>
+          </div>
+          <div class="op-item-title">Cooling Tower CT-01 & CT-02 Basin Cleaning & Dosing</div>
+          <div class="op-item-desc">Sludge de-silting, fan pitch check, biocide and anti-scalant chemical dosing level verification.</div>
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-user-gear"></i> Assigned: Tech Santosh</span>
+            <button class="btn-gold-outline">Checklist</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Major Work -->
+      <div class="tab-content-panel" id="tab-hvac-major">
+        <div class="section-title">
+          <span>Major Overhauls & Projects</span>
+          <span style="font-size:0.72rem; color:var(--gold-primary)">Overhauling</span>
+        </div>
+
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-major">Major Overhauling</span>
+            <span style="font-size:0.72rem; color:var(--gold-light);">Winter Overhaul</span>
+          </div>
+          <div class="op-item-title">Chiller-02 Condenser & Evaporator Tube Descaling</div>
+          <div class="op-item-desc">Mechanical rotary brush descaling of 380 copper condenser tubes to restore approach temperature &lt; 2.5°F. Scheduled for upcoming winter maintenance window.</div>
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-calendar-days"></i> Timeline: 15 Nov - 20 Nov</span>
+            <button class="btn-gold-solid">Work Scope</button>
+          </div>
+        </div>
+
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-major">Energy Retrofit</span>
+            <span style="font-size:0.72rem; color:var(--text-muted);">In Progress</span>
+          </div>
+          <div class="op-item-title">Secondary Chilled Water Pump VFD Integration</div>
+          <div class="op-item-desc">Installation of 2 x 45 kW Danfoss VFDs with differential pressure transmitter loop to optimize pumping energy consumption.</div>
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-gauge"></i> Expected Saving: ~14% kWh</span>
+            <button class="btn-gold-outline">Progress 60%</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Pending Work -->
+      <div class="tab-content-panel" id="tab-hvac-pending">
+        <div class="section-title">
+          <span>Pending Complaints & Snags</span>
+          <span style="font-size:0.72rem; color:var(--danger)">1 Pending</span>
+        </div>
+
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-pending">Temperature Snag</span>
+            <span style="font-size:0.72rem; color:var(--danger)">High Priority</span>
+          </div>
+          <div class="op-item-title">GHQ 5th Floor Conference Hall High Temperature (26°C)</div>
+          <div class="op-item-desc">VAV box actuator motor jammed at 20% open position. Belimo 24V modulating actuator replacement required. Room temp target 22°C.</div>
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-user-clock"></i> Assigned: Tech Vijay</span>
+            <button class="btn-gold-solid">Close Ticket</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ==================== SCREEN 4: PLUMBING ==================== -->
+    <section class="screen-view" id="screen-plumbing">
+      <div class="op-screen-header">
+        <button class="op-back-btn" onclick="openModule('screen-dashboard')">
+          <i class="fa-solid fa-arrow-left"></i> Dashboard
+        </button>
+        <div class="op-title-area" style="text-align:right">
+          <h2><i class="fa-solid fa-faucet-drip"></i> Plumbing</h2>
+          <p>Water Supply & STP/WTP Ops</p>
+        </div>
+      </div>
+
+      <!-- 3 Sub Categories -->
+      <div class="cat-tabs">
+        <button class="cat-tab-btn active" onclick="switchTab('screen-plumbing', 'tab-plumb-pm', this)">
+          <i class="fa-solid fa-calendar-check"></i> 1. PM Schedule
+        </button>
+        <button class="cat-tab-btn" onclick="switchTab('screen-plumbing', 'tab-plumb-major', this)">
+          <i class="fa-solid fa-screwdriver-wrench"></i> 2. Major Work
+        </button>
+        <button class="cat-tab-btn" onclick="switchTab('screen-plumbing', 'tab-plumb-pending', this)">
+          <i class="fa-solid fa-clock-rotate-left"></i> 3. Pending Work
+        </button>
+      </div>
+
+      <!-- Tab 1: PM Schedule -->
+      <div class="tab-content-panel active" id="tab-plumb-pm">
+        <div class="section-title">
+          <span>Scheduled Plumbing PM</span>
+          <span style="font-size:0.72rem; color:var(--cyan)">Monthly Routine</span>
+        </div>
+
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-pm">Monthly PM</span>
+            <span style="font-size:0.72rem; color:var(--gold-light);">Due: In 2 Days</span>
+          </div>
+          <div class="op-item-title">Hydro-Pneumatic (HYPN) Booster Pumps 1 & 2 Servicing</div>
+          <div class="op-item-desc">Pressure vessel diaphragm air charge check (maintained at 3.5 bar), mechanical seal leakage inspection, check valve operation.</div>
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-user-gear"></i> Assigned: Tech Ganesh</span>
+            <button class="btn-gold-solid">Execute PM</button>
+          </div>
+        </div>
+
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-pm">Monthly PM</span>
+            <span style="font-size:0.72rem; color:var(--text-muted);">Due: In 6 Days</span>
+          </div>
+          <div class="op-item-title">STP Aeration Tank Roots Blowers PM</div>
+          <div class="op-item-desc">Gear oil replacement, air intake filter cleaning, V-belt tension, dissolved oxygen (DO) sensor calibration.</div>
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-user-gear"></i> Assigned: Tech Santosh</span>
+            <button class="btn-gold-outline">Checklist</button>
+          </div>
+        </div>
+
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-pm">Quarterly PM</span>
+            <span style="font-size:0.72rem; color:var(--text-muted);">Due: In 10 Days</span>
+          </div>
+          <div class="op-item-title">Domestic & Flushing Underground Tanks (UGT) Chlorination</div>
+          <div class="op-item-desc">Water quality lab testing for TDS, hardness, residual chlorine, and E-Coli count according to IS 10500 standards.</div>
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-vial"></i> Quality Audit Compliance</span>
+            <button class="btn-gold-outline">Test Sheet</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Major Work -->
+      <div class="tab-content-panel" id="tab-plumb-major">
+        <div class="section-title">
+          <span>Major Overhauls & Projects</span>
+          <span style="font-size:0.72rem; color:var(--gold-primary)">Upgrades</span>
+        </div>
+
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-major">Major Overhaul</span>
+            <span style="font-size:0.72rem; color:var(--gold-light);">Annual Overhaul</span>
+          </div>
+          <div class="op-item-title">STP Filter Media Replacement (Sand & Activated Carbon)</div>
+          <div class="op-item-desc">Complete extraction and refilling of 1,200 kg high-grade graded gravel, silica sand, and activated carbon media (IV 900) in dual media filters.</div>
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-truck-ramp-box"></i> Vendor: AquaEnviro Systems</span>
+            <button class="btn-gold-solid">Work Order</button>
+          </div>
+        </div>
+
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-major">Piping Modification</span>
+            <span style="font-size:0.72rem; color:var(--text-muted);">Planned</span>
+          </div>
+          <div class="op-item-title">Basement Rainwater Harvesting Ring Line Rerouting</div>
+          <div class="op-item-desc">Replacing corroded 100mm MS line with heavy-duty CPVC Class 1 schedule 80 piping to prevent monsoon seepage.</div>
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-ruler-combined"></i> Length: 45 Meters</span>
+            <button class="btn-gold-outline">Drawing SLD</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Pending Work -->
+      <div class="tab-content-panel" id="tab-plumb-pending">
+        <div class="section-title">
+          <span>Pending Complaints & Snags</span>
+          <span style="font-size:0.72rem; color:var(--danger)">2 Pending</span>
+        </div>
+
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-pending">Active Breakdown #1024</span>
+            <span style="font-size:0.72rem; color:var(--danger)">High Priority</span>
+          </div>
+          <div class="op-item-title">Basement Sump Pump 2 Not Starting (Trip on Overload)</div>
+          <div class="op-item-desc">Pump jammed due to foreign debris entanglement in impeller. Impeller de-clogging and winding resistance test required.</div>
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-triangle-exclamation" style="color:var(--danger)"></i> Risk: Basement Flooding</span>
+            <button class="btn-gold-solid">Assign Tech</button>
+          </div>
+        </div>
+
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-pending">Pending Fix</span>
+            <span style="font-size:0.72rem; color:var(--amber)">Medium Priority</span>
+          </div>
+          <div class="op-item-title">3rd Floor Executive Restroom Sensor Urinal Continuous Flush</div>
+          <div class="op-item-desc">Solenoid valve diaphragm tear causing continuous water wastage. Replacement valve requested from store.</div>
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-faucet"></i> Tech: Ganesh Assigned</span>
+            <button class="btn-gold-outline">Update Status</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ==================== SCREEN 5: DG & FUEL ==================== -->
+    <section class="screen-view" id="screen-dg">
+      <div class="op-screen-header">
+        <button class="op-back-btn" onclick="openModule('screen-dashboard')">
+          <i class="fa-solid fa-arrow-left"></i> Dashboard
+        </button>
+        <div class="op-title-area" style="text-align:right">
+          <h2><i class="fa-solid fa-gas-pump"></i> DG & Fuel</h2>
+          <p>Diesel Generator & Power Backup</p>
+        </div>
+      </div>
+
+      <!-- 1 Sub Category (Load Trial) -->
+      <div class="cat-tabs">
+        <button class="cat-tab-btn active" style="flex:1" onclick="switchTab('screen-dg', 'tab-dg-trial', this)">
+          <i class="fa-solid fa-gauge-high"></i> 1. Load Trial
+        </button>
+      </div>
+
+      <!-- Tab 1: Load Trial -->
+      <div class="tab-content-panel active" id="tab-dg-trial">
+        <div class="section-title">
+          <span>DG Load Trial & Health Audit</span>
+          <span style="font-size:0.72rem; color:var(--gold-primary)">Routine Protocol</span>
+        </div>
+
+        <!-- Quick Summary Metrics -->
+        <div class="metric-grid-4">
+          <div class="metric-card">
+            <div class="metric-header">
+              <span>DG-01 Fuel</span>
+              <i class="fa-solid fa-gas-pump"></i>
+            </div>
+            <div class="metric-val">82%</div>
+            <div class="metric-sub">850 Litres</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-header">
+              <span>DG-02 Fuel</span>
+              <i class="fa-solid fa-gas-pump"></i>
+            </div>
+            <div class="metric-val">76%</div>
+            <div class="metric-sub">780 Litres</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-header">
+              <span>Battery 01</span>
+              <i class="fa-solid fa-car-battery"></i>
+            </div>
+            <div class="metric-val">26.4 V</div>
+            <div class="metric-sub">Float Charged</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-header">
+              <span>Last Trial</span>
+              <i class="fa-solid fa-clock-rotate-left"></i>
+            </div>
+            <div class="metric-val">28 Oct</div>
+            <div class="metric-sub">Passed 70% Load</div>
+          </div>
+        </div>
+
+        <!-- Load Trial Action & Logs -->
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-trial">Weekly Load Test</span>
+            <span style="font-size:0.72rem; color:var(--gold-light);">Next Due: Wednesday</span>
+          </div>
+          <div class="op-item-title">DG-01 (1500 kVA Cummins) Synchronous Load Trial</div>
+          <div class="op-item-desc">
+            Standard test parameters: 15-minute idle run, 30-minute test at building base load approx 450-600 kW. Log oil pressure 3.5-5.5 bar, coolant temperature under 85°C, frequency 50.1 Hz, and exhaust smoke density.
+          </div>
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-clipboard-list"></i> AMF Auto-Changeover Test</span>
+            <button class="btn-gold-solid">Start Load Trial</button>
+          </div>
+        </div>
+
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-trial">Recent Trial Report</span>
+            <span style="font-size:0.72rem; color:var(--text-muted);">Completed: 28 Oct 2026</span>
+          </div>
+          <div class="op-item-title">DG-02 (1500 kVA) Full Load Verification Log</div>
+          <div class="op-item-desc">
+            Trial Run Duration: 45 Mins | Peak Load: 680 kW | Specific Fuel Consumption: 0.22 L/kWh | Lube Oil Temp: 82°C | Alternator Winding Temp: 74°C. All safety relays operational.
+          </div>
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-check-circle" style="color:var(--success)"></i> Result: Healthy & Normal</span>
+            <button class="btn-gold-outline">Download PDF</button>
+          </div>
+        </div>
+
+        <div class="op-item-card">
+          <div class="op-item-top">
+            <span class="tag-badge tag-major">B-Check Service</span>
+            <span style="font-size:0.72rem; color:var(--amber)">Upcoming at 250 Hrs</span>
+          </div>
+          <div class="op-item-title">DG-01 Cummins B-Check Engine Service</div>
+          <div class="op-item-desc">
+            Current Running Hours: 228 Hrs. Service due in 22 operating hours. Scope: Replacement of Lube Oil Valvoline Premium Blue 15W40, Oil Filters, Fuel Filters, and Coolant conditioner.
+          </div>
+          <div class="op-item-foot">
+            <span><i class="fa-solid fa-hourglass-half"></i> Balance: 22 Running Hrs</span>
+            <button class="btn-gold-outline">Service PO</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Original 5-Button Bottom Navigation Bar Restored -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" id="nav-dash" onclick="openModule('screen-dashboard')">
+        <i class="fa-solid fa-chart-pie"></i>
+        <span>Dashboard</span>
+      </button>
+      <button class="nav-item" id="nav-readings" onclick="openModule('screen-readings')">
+        <i class="fa-solid fa-pen-nib"></i>
+        <span>Readings</span>
+      </button>
+      <button class="nav-item" id="nav-ppm" onclick="openModule('screen-ppm')">
+        <i class="fa-solid fa-calendar-days"></i>
+        <span>PPM</span>
+      </button>
+      <button class="nav-item" id="nav-tickets" onclick="openModule('screen-electrical', 'tab-elec-pending')">
+        <i class="fa-solid fa-screwdriver-wrench"></i>
+        <span>Tickets</span>
+      </button>
+      <button class="nav-item" id="nav-assets" onclick="openModule('screen-assets')">
+        <i class="fa-solid fa-cubes"></i>
+        <span>Assets</span>
+      </button>
+    </nav>
+
+  </div>
+
+  <script>
+    // Toggle Sidebar Drawer
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('overlay');
+      if (sidebar.classList.contains('open')) {
+        sidebar.classList.remove('open');
+        overlay.style.display = 'none';
+      } else {
+        sidebar.classList.add('open');
+        overlay.style.display = 'block';
+      }
+    }
+
+    // Switch Screen / Module View
+    function openModule(screenId, targetTabId = null) {
+      // Close sidebar if open
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('overlay');
+      sidebar.classList.remove('open');
+      overlay.style.display = 'none';
+
+      // Hide all screens
+      const screens = document.querySelectorAll('.screen-view');
+      screens.forEach(screen => screen.classList.remove('active'));
+
+      // Show requested screen
+      const activeScreen = document.getElementById(screenId);
+      if (activeScreen) {
+        activeScreen.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      // Update Bottom Nav Active Indicator
+      const navButtons = document.querySelectorAll('.bottom-nav .nav-item');
+      navButtons.forEach(btn => btn.classList.remove('active'));
+
+      if (screenId === 'screen-dashboard') {
+        document.getElementById('nav-dash').classList.add('active');
+      } else if (screenId === 'screen-readings') {
+        initAllReadings();
+        document.getElementById('nav-readings').classList.add('active');
+      } else if (screenId === 'screen-ppm') {
+        renderCalendar();
+        document.getElementById('nav-ppm').classList.add('active');
+      } else if (screenId === 'screen-assets') {
+        document.getElementById('nav-assets').classList.add('active');
+        backToAssetCategories();
+      } else if (targetTabId && targetTabId.includes('pending')) {
+        document.getElementById('nav-tickets').classList.add('active');
+      } else {
+        document.getElementById('nav-dash').classList.add('active');
+      }
+
+      // Update Subtitle in Top Bar
+      const subTitle = document.getElementById('top-bar-sub');
+      if (screenId === 'screen-dashboard') subTitle.textContent = "Operations & Maintenance Manager";
+      else if (screenId === 'screen-readings') subTitle.textContent = "Daily Utility Readings";
+      else if (screenId === 'screen-ppm') subTitle.textContent = "Planned Preventive Maintenance";
+      else if (screenId === 'screen-reports') subTitle.textContent = "O&M Reports (DSR / WSR / MMR)";
+      else if (screenId === 'screen-assets') subTitle.textContent = "Asset Master & Registers";
+      else if (screenId === 'screen-electrical') subTitle.textContent = "Electrical Operations";
+      else if (screenId === 'screen-hvac') subTitle.textContent = "HVAC Operations";
+      else if (screenId === 'screen-plumbing') subTitle.textContent = "Plumbing Operations";
+      else if (screenId === 'screen-dg') subTitle.textContent = "DG & Fuel Operations";
+
+      // If specific sub-tab is requested
+      if (targetTabId && activeScreen) {
+        const targetTab = document.getElementById(targetTabId);
+        if (targetTab) {
+          const tabPanels = activeScreen.querySelectorAll('.tab-content-panel');
+          tabPanels.forEach(p => p.classList.remove('active'));
+          targetTab.classList.add('active');
+
+          // Highlight corresponding tab button
+          const tabBtns = activeScreen.querySelectorAll('.cat-tab-btn');
+          tabBtns.forEach(btn => {
+            if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(targetTabId)) {
+              btn.classList.add('active');
+            } else {
+              btn.classList.remove('active');
+            }
+          });
+        }
+      }
+    }
+
+    // Switch Category Tabs inside Sub-Operations
+    function switchTab(screenId, tabId, btnElement) {
+      const screen = document.getElementById(screenId);
+      if (!screen) return;
+
+      // Deactivate all tab buttons in this screen
+      const tabBtns = screen.querySelectorAll('.cat-tab-btn');
+      tabBtns.forEach(btn => btn.classList.remove('active'));
+
+      // Activate clicked button
+      if (btnElement) {
+        btnElement.classList.add('active');
+      }
+
+      // Deactivate all panels in this screen
+      const panels = screen.querySelectorAll('.tab-content-panel');
+      panels.forEach(panel => panel.classList.remove('active'));
+
+      // Activate selected panel
+      const targetPanel = document.getElementById(tabId);
+      if (targetPanel) {
+        targetPanel.classList.add('active');
+      }
+    }
+  
+
+    // Calendar Dynamic Logic
+    let currentCalDate = new Date(2026, 10, 2); // Default Nov 2, 2026
+    let selectedCalDay = 2;
+
+    // Sample Scheduled PPM task markers per day
+    const scheduledTasks = {
+      2: { count: "2 Tasks Due", elec: true, hvac: true, plumb: false },
+      3: { count: "1 Task Due", elec: true, hvac: false, plumb: false },
+      4: { count: "1 Task Due", elec: false, hvac: false, plumb: true },
+      6: { count: "2 Tasks Due", elec: false, hvac: true, plumb: true },
+      7: { count: "1 Task Due", elec: true, hvac: false, plumb: false },
+      10: { count: "1 Task Due", elec: true, hvac: false, plumb: false },
+      12: { count: "1 Task Due", elec: false, hvac: false, plumb: true },
+      15: { count: "2 Tasks Due", elec: true, hvac: true, plumb: false },
+      20: { count: "1 Task Due", elec: false, hvac: true, plumb: false },
+      25: { count: "1 Task Due", elec: false, hvac: false, plumb: true }
+    };
+
+    function renderCalendar() {
+      const monthSelect = document.getElementById('cal-month-select');
+      const yearSelect = document.getElementById('cal-year-select');
+      const daysGrid = document.getElementById('cal-days-grid');
+      
+      if (!monthSelect || !yearSelect || !daysGrid) return;
+
+      const month = parseInt(monthSelect.value);
+      const year = parseInt(yearSelect.value);
+
+      // Get first day of the month and total days
+      const firstDayIndex = new Date(year, month, 1).getDay(); // 0 is Sunday
+      const totalDaysInMonth = new Date(year, month + 1, 0).getDate();
+
+      daysGrid.innerHTML = '';
+
+      // Blank slots before first day
+      for (let i = 0; i < firstDayIndex; i++) {
+        const emptyDiv = document.createElement('div');
+        emptyDiv.className = 'cal-day empty';
+        daysGrid.appendChild(emptyDiv);
+      }
+
+      const today = new Date();
+      const isCurrentMonthAndYear = (today.getFullYear() === year && today.getMonth() === month);
+
+      // Fill days
+      for (let day = 1; day <= totalDaysInMonth; day++) {
+        const dayDiv = document.createElement('div');
+        dayDiv.className = 'cal-day';
+        
+        if (isCurrentMonthAndYear && today.getDate() === day) {
+          dayDiv.classList.add('today');
+        }
+
+        if (day === selectedCalDay) {
+          dayDiv.classList.add('selected');
+        }
+
+        const numSpan = document.createElement('span');
+        numSpan.className = 'cal-day-num';
+        numSpan.textContent = day;
+        dayDiv.appendChild(numSpan);
+
+        // Add dots if scheduled
+        if (scheduledTasks[day]) {
+          const dotsDiv = document.createElement('div');
+          dotsDiv.className = 'cal-day-dots';
+          if (scheduledTasks[day].elec) {
+            const d = document.createElement('span');
+            d.className = 'cal-dot dot-elec';
+            dotsDiv.appendChild(d);
+          }
+          if (scheduledTasks[day].hvac) {
+            const d = document.createElement('span');
+            d.className = 'cal-dot dot-hvac';
+            dotsDiv.appendChild(d);
+          }
+          if (scheduledTasks[day].plumb) {
+            const d = document.createElement('span');
+            d.className = 'cal-dot dot-plumb';
+            dotsDiv.appendChild(d);
+          }
+          dayDiv.appendChild(dotsDiv);
+        }
+
+        dayDiv.onclick = function() {
+          selectCalDate(day, month, year);
+        };
+
+        daysGrid.appendChild(dayDiv);
+      }
+
+      updateSelectedBanner(selectedCalDay, month, year);
+    }
+
+    function selectCalDate(day, month, year) {
+      selectedCalDay = day;
+      renderCalendar();
+      updateSelectedBanner(day, month, year);
+    }
+
+    function updateSelectedBanner(day, month, year) {
+      const bannerText = document.getElementById('banner-date-text');
+      const bannerBadge = document.getElementById('banner-task-count');
+      if (!bannerText || !bannerBadge) return;
+
+      const dateObj = new Date(year, month, day);
+      const options = { weekday: 'long', year: 'numeric', month: 'short', day: '2-digit' };
+      bannerText.textContent = "Selected: " + dateObj.toLocaleDateString('en-GB', options);
+
+      if (scheduledTasks[day]) {
+        bannerBadge.textContent = scheduledTasks[day].count;
+        bannerBadge.style.display = 'inline-block';
+      } else {
+        bannerBadge.textContent = "No Tasks Due";
+        bannerBadge.style.display = 'inline-block';
+      }
+      updateMonthlyTotals(month, year);
+    }
+
+    function updateMonthlyTotals(month, year) {
+      // Calculate totals for the selected month
+      let elecCount = 0;
+      let hvacCount = 0;
+      let plumbCount = 0;
+
+      for (const [day, data] of Object.entries(scheduledTasks)) {
+        if (data.elec) elecCount++;
+        if (data.hvac) hvacCount++;
+        if (data.plumb) plumbCount++;
+      }
+
+      const multiplier = (month % 3 === 0) ? 1 : (month % 3 === 1 ? 2 : 0);
+      const totalElec = elecCount + multiplier;
+      const totalHvac = hvacCount + (multiplier > 0 ? 1 : 0);
+      const totalPlumb = plumbCount + (multiplier > 1 ? 1 : 0);
+      const grandTotal = totalElec + totalHvac + totalPlumb;
+
+      // Realistic Complete vs Pending ratio for the month
+      const compElec = Math.max(1, Math.floor(totalElec * 0.6));
+      const pendElec = totalElec - compElec;
+
+      const compHvac = Math.max(1, Math.floor(totalHvac * 0.7));
+      const pendHvac = totalHvac - compHvac;
+
+      const compPlumb = Math.max(1, Math.floor(totalPlumb * 0.5));
+      const pendPlumb = totalPlumb - compPlumb;
+
+      const totalMonthlyEl = document.getElementById('total-monthly-ppm');
+      
+      const totalElecEl = document.getElementById('total-elec-ppm');
+      const compElecEl = document.getElementById('comp-elec-ppm');
+      const pendElecEl = document.getElementById('pend-elec-ppm');
+
+      const totalHvacEl = document.getElementById('total-hvac-ppm');
+      const compHvacEl = document.getElementById('comp-hvac-ppm');
+      const pendHvacEl = document.getElementById('pend-hvac-ppm');
+
+      const totalPlumbEl = document.getElementById('total-plumb-ppm');
+      const compPlumbEl = document.getElementById('comp-plumb-ppm');
+      const pendPlumbEl = document.getElementById('pend-plumb-ppm');
+
+      if (totalMonthlyEl) totalMonthlyEl.textContent = grandTotal + " Tasks";
+
+      if (totalElecEl) totalElecEl.textContent = totalElec;
+      if (compElecEl) compElecEl.textContent = compElec;
+      if (pendElecEl) pendElecEl.textContent = pendElec;
+
+      if (totalHvacEl) totalHvacEl.textContent = totalHvac;
+      if (compHvacEl) compHvacEl.textContent = compHvac;
+      if (pendHvacEl) pendHvacEl.textContent = pendHvac;
+
+      if (totalPlumbEl) totalPlumbEl.textContent = totalPlumb;
+      if (compPlumbEl) compPlumbEl.textContent = compPlumb;
+      if (pendPlumbEl) pendPlumbEl.textContent = pendPlumb;
+    }
+
+    function onDateSelectionChange() {
+      selectedCalDay = 1;
+      renderCalendar();
+    }
+
+    function changeMonth(delta) {
+      const monthSelect = document.getElementById('cal-month-select');
+      const yearSelect = document.getElementById('cal-year-select');
+      let month = parseInt(monthSelect.value) + delta;
+      let year = parseInt(yearSelect.value);
+
+      if (month < 0) {
+        month = 11;
+        year -= 1;
+      } else if (month > 11) {
+        month = 0;
+        year += 1;
+      }
+
+      monthSelect.value = month;
+      yearSelect.value = year;
+      selectedCalDay = 1;
+      renderCalendar();
+    }
+
+    // Initialize calendar on load
+    document.addEventListener("DOMContentLoaded", function() {
+      renderCalendar();
+      initAllReadings();
+    });
+
+
+
+    // Feeder Database per Panel
+    const elecData = {
+      "Main Substation PMCC": [
+        { name: "Incomer 1 (11kV Grid)", prevReading: 124500, yesterday: 4650, baseVal: 129320 },
+        { name: "Incomer 2 (Bus Coupler)", prevReading: 85200, yesterday: 2100, baseVal: 87300 },
+        { name: "DG-01 Backup Feeder", prevReading: 41200, yesterday: 620, baseVal: 41820 },
+        { name: "DG-02 Backup Feeder", prevReading: 38900, yesterday: 0, baseVal: 38900 }
+      ],
+      "GHQ Main LT Panel": [
+        { name: "Floor 1-3 Lighting & Power", prevReading: 45600, yesterday: 1120, baseVal: 46720 },
+        { name: "Floor 4-6 Lighting & Power", prevReading: 51200, yesterday: 1350, baseVal: 52550 },
+        { name: "Elevators & Lift Bank Feeder", prevReading: 22100, yesterday: 480, baseVal: 22580 },
+        { name: "Basement Parking & Sump Pumps", prevReading: 18400, yesterday: 310, baseVal: 18710 }
+      ],
+      "Essential DG Sync Panel": [
+        { name: "Life Safety & Fire Pump Feeder", prevReading: 12300, yesterday: 85, baseVal: 12385 },
+        { name: "Emergency Staircase Lighting", prevReading: 8400, yesterday: 140, baseVal: 8540 }
+      ],
+      "NMAEYC Floor Distribution Panel": [
+        { name: "Main Office Incomer Feeder", prevReading: 32100, yesterday: 1610, baseVal: 33750 },
+        { name: "Server PAC & Critical UPS Load", prevReading: 19800, yesterday: 520, baseVal: 20320 }
+      ],
+      "HVAC Plant LT Panel": [
+        { name: "Chiller-01 Compressor Feeder", prevReading: 89400, yesterday: 2450, baseVal: 91850 },
+        { name: "Chiller-02 Compressor Feeder", prevReading: 78100, yesterday: 0, baseVal: 78100 },
+        { name: "Primary & Secondary Pump Bank", prevReading: 34500, yesterday: 890, baseVal: 35390 },
+        { name: "Cooling Tower CT Fan Bank", prevReading: 19200, yesterday: 420, baseVal: 19620 }
+      ]
+    };
+
+    const waterData = {
+      "GHQ Main Water Header": [
+        { name: "DWS Domestic Water Header", prevReading: 412.0, yesterday: 11.8, baseVal: 424.4 },
+        { name: "FWS Flushing Water Header", prevReading: 215.0, yesterday: 5.9, baseVal: 221.1 }
+      ],
+      "NMAEYC Sub-Header Panel": [
+        { name: "NMAEYC DWS Flow Meter", prevReading: 142.0, yesterday: 4.1, baseVal: 146.2 },
+        { name: "NMAEYC FWS Flow Meter", prevReading: 68.0, yesterday: 1.9, baseVal: 70.0 }
+      ],
+      "STP / WTP Treatment Plant": [
+        { name: "Raw Water Inflow Meter", prevReading: 580.0, yesterday: 18.2, baseVal: 598.2 },
+        { name: "STP Treated Water Outflow", prevReading: 460.0, yesterday: 14.0, baseVal: 474.0 }
+      ],
+      "Cooling Tower Makeup Panel": [
+        { name: "CT-01 & CT-02 Makeup Water", prevReading: 310.0, yesterday: 8.5, baseVal: 318.5 }
+      ]
+    };
+
+    const btuData = {
+      "Central Chiller Plant Header": [
+        { name: "Chiller Plant Main BTU Header", prevReading: 3410.0, yesterday: 358.0, baseVal: 3773.4 },
+        { name: "Chiller-01 Dedicated Evaporator Loop", prevReading: 1820.0, yesterday: 210.0, baseVal: 2030.0 }
+      ],
+      "GHQ Office Tower BTU Panel": [
+        { name: "Floors 1-3 AHU BTU Line", prevReading: 940.0, yesterday: 98.0, baseVal: 1038.0 },
+        { name: "Floors 4-6 AHU BTU Line", prevReading: 1120.0, yesterday: 115.0, baseVal: 1235.0 }
+      ],
+      "NMAEYC BTU Meter Panel": [
+        { name: "NMAEYC Tenant Primary Loop", prevReading: 1240.0, yesterday: 138.0, baseVal: 1382.1 }
+      ],
+      "Server PAC Chilled Loop": [
+        { name: "PAC High-Density Data Hall", prevReading: 680.0, yesterday: 45.0, baseVal: 725.0 }
+      ]
+    };
+
+    function updateElecFeeders() {
+      const panelSelect = document.getElementById('elec-panel-select');
+      const feederSelect = document.getElementById('elec-feeder-select');
+      const currentInput = document.getElementById('elec-current-reading');
+      if (!panelSelect || !feederSelect) return;
+
+      const panel = panelSelect.value;
+      const feeders = elecData[panel] || [];
+
+      feederSelect.innerHTML = '';
+      feeders.forEach((f, idx) => {
+        const opt = document.createElement('option');
+        opt.value = idx;
+        opt.textContent = f.name;
+        feederSelect.appendChild(opt);
+      });
+
+      if (feeders.length > 0) {
+        currentInput.value = feeders[0].baseVal;
+        calculateElecConsumption();
+      }
+    }
+
+    function calculateElecConsumption() {
+      const panelSelect = document.getElementById('elec-panel-select');
+      const feederSelect = document.getElementById('elec-feeder-select');
+      const currentInput = document.getElementById('elec-current-reading');
+      const targetLabel = document.getElementById('elec-display-target');
+      const yestEl = document.getElementById('elec-yesterday-val');
+      const todayEl = document.getElementById('elec-today-val');
+
+      const panel = panelSelect.value;
+      const idx = parseInt(feederSelect.value) || 0;
+      const feeder = (elecData[panel] && elecData[panel][idx]) ? elecData[panel][idx] : null;
+
+      if (!feeder) return;
+
+      targetLabel.textContent = panel + " → " + feeder.name;
+      yestEl.innerHTML = feeder.yesterday.toLocaleString() + " <small>kWh</small>";
+
+      const currentVal = parseFloat(currentInput.value);
+      if (!isNaN(currentVal) && currentVal >= feeder.prevReading) {
+        const todayDiff = Math.round(currentVal - feeder.prevReading);
+        todayEl.innerHTML = todayDiff.toLocaleString() + " <small>kWh</small>";
+      } else {
+        todayEl.innerHTML = "0 <small>kWh</small>";
+      }
+    }
+
+    function updateWaterFeeders() {
+      const panelSelect = document.getElementById('water-panel-select');
+      const feederSelect = document.getElementById('water-feeder-select');
+      const currentInput = document.getElementById('water-current-reading');
+      if (!panelSelect || !feederSelect) return;
+
+      const panel = panelSelect.value;
+      const feeders = waterData[panel] || [];
+
+      feederSelect.innerHTML = '';
+      feeders.forEach((f, idx) => {
+        const opt = document.createElement('option');
+        opt.value = idx;
+        opt.textContent = f.name;
+        feederSelect.appendChild(opt);
+      });
+
+      if (feeders.length > 0) {
+        currentInput.value = feeders[0].baseVal;
+        calculateWaterConsumption();
+      }
+    }
+
+    function calculateWaterConsumption() {
+      const panelSelect = document.getElementById('water-panel-select');
+      const feederSelect = document.getElementById('water-feeder-select');
+      const currentInput = document.getElementById('water-current-reading');
+      const targetLabel = document.getElementById('water-display-target');
+      const yestEl = document.getElementById('water-yesterday-val');
+      const todayEl = document.getElementById('water-today-val');
+
+      const panel = panelSelect.value;
+      const idx = parseInt(feederSelect.value) || 0;
+      const feeder = (waterData[panel] && waterData[panel][idx]) ? waterData[panel][idx] : null;
+
+      if (!feeder) return;
+
+      targetLabel.textContent = panel + " → " + feeder.name;
+      yestEl.innerHTML = feeder.yesterday.toFixed(1) + " <small>kL</small>";
+
+      const currentVal = parseFloat(currentInput.value);
+      if (!isNaN(currentVal) && currentVal >= feeder.prevReading) {
+        const todayDiff = (currentVal - feeder.prevReading).toFixed(1);
+        todayEl.innerHTML = todayDiff + " <small>kL</small>";
+      } else {
+        todayEl.innerHTML = "0.0 <small>kL</small>";
+      }
+    }
+
+    function updateBtuFeeders() {
+      const panelSelect = document.getElementById('btu-panel-select');
+      const feederSelect = document.getElementById('btu-feeder-select');
+      const currentInput = document.getElementById('btu-current-reading');
+      if (!panelSelect || !feederSelect) return;
+
+      const panel = panelSelect.value;
+      const feeders = btuData[panel] || [];
+
+      feederSelect.innerHTML = '';
+      feeders.forEach((f, idx) => {
+        const opt = document.createElement('option');
+        opt.value = idx;
+        opt.textContent = f.name;
+        feederSelect.appendChild(opt);
+      });
+
+      if (feeders.length > 0) {
+        currentInput.value = feeders[0].baseVal;
+        calculateBtuConsumption();
+      }
+    }
+
+    function calculateBtuConsumption() {
+      const panelSelect = document.getElementById('btu-panel-select');
+      const feederSelect = document.getElementById('btu-feeder-select');
+      const currentInput = document.getElementById('btu-current-reading');
+      const targetLabel = document.getElementById('btu-display-target');
+      const yestEl = document.getElementById('btu-yesterday-val');
+      const todayEl = document.getElementById('btu-today-val');
+
+      const panel = panelSelect.value;
+      const idx = parseInt(feederSelect.value) || 0;
+      const feeder = (btuData[panel] && btuData[panel][idx]) ? btuData[panel][idx] : null;
+
+      if (!feeder) return;
+
+      targetLabel.textContent = panel + " → " + feeder.name;
+      yestEl.innerHTML = feeder.yesterday.toFixed(1) + " <small>MWH</small>";
+
+      const currentVal = parseFloat(currentInput.value);
+      if (!isNaN(currentVal) && currentVal >= feeder.prevReading) {
+        const todayDiff = (currentVal - feeder.prevReading).toFixed(1);
+        todayEl.innerHTML = todayDiff + " <small>MWH</small>";
+      } else {
+        todayEl.innerHTML = "0.0 <small>MWH</small>";
+      }
+    }
+
+    // Call updates on init
+    function initAllReadings() {
+      updateElecFeeders();
+      updateWaterFeeders();
+      updateBtuFeeders();
+    }
+
+
+
+    // Report Download / Generation Handler
+    function generateReport(reportName, fileType) {
+      alert("Generating " + reportName + " in " + fileType + " format...\nFile is downloaded successfully!");
+    }
+
+
+
+    // Comprehensive Engineering Asset Master Database
+    const assetRegister = {
+      "elec": {
+        title: "Electrical Assets Sheet",
+        count: "24 Assets",
+        items: [
+          { tag: "TR-01", name: "1500 kVA Oil Type Power Transformer", loc: "Substation Yard", rating: "11kV / 433V", make: "Schneider Electric", status: "running" },
+          { tag: "TR-02", name: "1500 kVA Oil Type Power Transformer", loc: "Substation Yard", rating: "11kV / 433V", make: "Schneider Electric", status: "running" },
+          { tag: "HT-VCB-01", name: "11kV Incomer Vacuum Circuit Breaker", loc: "HT Switchgear Room", rating: "630A, 25kA", make: "ABB", status: "running" },
+          { tag: "HT-VCB-02", name: "11kV Outgoing Breaker TR-01", loc: "HT Switchgear Room", rating: "630A, 25kA", make: "ABB", status: "running" },
+          { tag: "HT-VCB-03", name: "11kV Outgoing Breaker TR-02", loc: "HT Switchgear Room", rating: "630A, 25kA", make: "ABB", status: "running" },
+          { tag: "DG-01", name: "1500 kVA Diesel Generator Set 1", loc: "DG Yard Basement", rating: "1500 kVA, 415V", make: "Cummins / Stamford", status: "standby" },
+          { tag: "DG-02", name: "1500 kVA Diesel Generator Set 2", loc: "DG Yard Basement", rating: "1500 kVA, 415V", make: "Cummins / Stamford", status: "standby" },
+          { tag: "DG-SYNC-01", name: "Automatic DG Synchronization Panel", loc: "DG Control Room", rating: "3000A Busbar", make: "L&T", status: "running" },
+          { tag: "PMCC-01", name: "Main Power Motor Control Center", loc: "LT Substation", rating: "3200A 50kA", make: "Siemens", status: "running" },
+          { tag: "LT-ACB-01", name: "Incomer 1 Air Circuit Breaker", loc: "Main LT Panel", rating: "2500A 4-Pole", make: "Schneider Masterpact", status: "running" },
+          { tag: "LT-ACB-02", name: "Incomer 2 Air Circuit Breaker", loc: "Main LT Panel", rating: "2500A 4-Pole", make: "Schneider Masterpact", status: "running" },
+          { tag: "APFC-01", name: "400 kVAR Automatic Power Factor Bank", loc: "Capacitor Room", rating: "400 kVAR Detuned", make: "Epcos / TDK", status: "running" },
+          { tag: "UPS-01", name: "160 kVA Online Modular UPS System", loc: "UPS Room Floor 1", rating: "160 kVA (N+1)", make: "Vertiv Liebert", status: "running" },
+          { tag: "UPS-02", name: "160 kVA Online Modular UPS System", loc: "UPS Room Floor 1", rating: "160 kVA (N+1)", make: "Vertiv Liebert", status: "maint" },
+          { tag: "DB-GHQ-F1", name: "Floor 1 Main Power Distribution Board", loc: "Floor 1 Electrical Shaft", rating: "250A MCCB Incomer", make: "Legrand", status: "running" },
+          { tag: "DB-GHQ-F2", name: "Floor 2 Main Power Distribution Board", loc: "Floor 2 Electrical Shaft", rating: "250A MCCB Incomer", make: "Legrand", status: "running" },
+          { tag: "DB-GHQ-F3", name: "Floor 3 Main Power Distribution Board", loc: "Floor 3 Electrical Shaft", rating: "250A MCCB Incomer", make: "Legrand", status: "running" },
+          { tag: "DB-GHQ-F4", name: "Floor 4 Main Power Distribution Board", loc: "Floor 4 Electrical Shaft", rating: "250A MCCB Incomer", make: "Legrand", status: "running" },
+          { tag: "DB-GHQ-F5", name: "Floor 5 Main Power Distribution Board", loc: "Floor 5 Electrical Shaft", rating: "250A MCCB Incomer", make: "Legrand", status: "running" },
+          { tag: "DB-GHQ-F6", name: "Floor 6 Main Power Distribution Board", loc: "Floor 6 Electrical Shaft", rating: "250A MCCB Incomer", make: "Legrand", status: "running" },
+          { tag: "PDB-NMAEYC", name: "NMAEYC Power Distribution Panel", loc: "NMAEYC Wing Electrical Shaft", rating: "400A MCCB Incomer", make: "Schneider", status: "running" },
+          { tag: "LDB-EMERG-01", name: "Emergency Staircase Lighting Panel", loc: "Core Shaft Basement", rating: "63A 4-Pole", make: "Hager", status: "running" },
+          { tag: "BATT-BANK-01", name: "DG-01 Starting Battery Bank (24V)", loc: "DG Room", rating: "2 x 12V 180Ah", make: "Exide", status: "running" },
+          { tag: "BATT-BANK-02", name: "DG-02 Starting Battery Bank (24V)", loc: "DG Room", rating: "2 x 12V 180Ah", make: "Exide", status: "running" }
+        ]
+      },
+      "hvac": {
+        title: "HVAC Assets Sheet",
+        count: "38 Assets",
+        items: [
+          { tag: "CH-01", name: "400 TR Water-Cooled Centrifugal Chiller", loc: "Central Chiller Plant", rating: "400 TR, R134a", make: "Johnson Controls York", status: "running" },
+          { tag: "CH-02", name: "400 TR Water-Cooled Centrifugal Chiller", loc: "Central Chiller Plant", rating: "400 TR, R134a", make: "Johnson Controls York", status: "standby" },
+          { tag: "CH-03", name: "250 TR Water-Cooled Screw Chiller", loc: "Central Chiller Plant", rating: "250 TR Variable Speed", make: "Daikin", status: "standby" },
+          { tag: "CT-01", name: "500 TR Induced Draft Cooling Tower", loc: "Building Terrace", rating: "1500 GPM Flow", make: "Paharpur", status: "running" },
+          { tag: "CT-02", name: "500 TR Induced Draft Cooling Tower", loc: "Building Terrace", rating: "1500 GPM Flow", make: "Paharpur", status: "running" },
+          { tag: "CT-03", name: "300 TR Induced Draft Cooling Tower", loc: "Building Terrace", rating: "900 GPM Flow", make: "Paharpur", status: "standby" },
+          { tag: "CHWP-P1", name: "Primary Chilled Water Pump 1", loc: "Chiller Plant Room", rating: "30 kW, 1200 GPM", make: "Grundfos", status: "running" },
+          { tag: "CHWP-P2", name: "Primary Chilled Water Pump 2", loc: "Chiller Plant Room", rating: "30 kW, 1200 GPM", make: "Grundfos", status: "standby" },
+          { tag: "CHWP-P3", name: "Primary Chilled Water Pump 3", loc: "Chiller Plant Room", rating: "30 kW, 1200 GPM", make: "Grundfos", status: "standby" },
+          { tag: "CHWP-S1", name: "Secondary Chilled Water Pump (VFD)", loc: "Chiller Plant Room", rating: "45 kW, 1400 GPM", make: "Armstrong", status: "running" },
+          { tag: "CHWP-S2", name: "Secondary Chilled Water Pump (VFD)", loc: "Chiller Plant Room", rating: "45 kW, 1400 GPM", make: "Armstrong", status: "running" },
+          { tag: "CDWP-01", name: "Condenser Water Pump 1", loc: "Chiller Plant Room", rating: "37 kW, 1500 GPM", make: "Kirloskar", status: "running" },
+          { tag: "CDWP-02", name: "Condenser Water Pump 2", loc: "Chiller Plant Room", rating: "37 kW, 1500 GPM", make: "Kirloskar", status: "running" },
+          { tag: "CDWP-03", name: "Condenser Water Pump 3", loc: "Chiller Plant Room", rating: "37 kW, 1500 GPM", make: "Kirloskar", status: "standby" },
+          { tag: "AHU-01", name: "Air Handling Unit Floor 1 (East)", loc: "AHU Room Floor 1", rating: "8,500 CFM, 7.5 kW", make: "Carrier", status: "running" },
+          { tag: "AHU-02", name: "Air Handling Unit Floor 1 (West)", loc: "AHU Room Floor 1", rating: "8,500 CFM, 7.5 kW", make: "Carrier", status: "running" },
+          { tag: "AHU-03", name: "Air Handling Unit Floor 2 (East)", loc: "AHU Room Floor 2", rating: "8,500 CFM, 7.5 kW", make: "Carrier", status: "running" },
+          { tag: "AHU-04", name: "Air Handling Unit Floor 2 (West)", loc: "AHU Room Floor 2", rating: "8,500 CFM, 7.5 kW", make: "Carrier", status: "running" },
+          { tag: "AHU-05", name: "Air Handling Unit Floor 3 (East)", loc: "AHU Room Floor 3", rating: "8,500 CFM, 7.5 kW", make: "Carrier", status: "running" },
+          { tag: "AHU-06", name: "Air Handling Unit Floor 3 (West)", loc: "AHU Room Floor 3", rating: "8,500 CFM, 7.5 kW", make: "Carrier", status: "running" },
+          { tag: "AHU-07", name: "Air Handling Unit Floor 4 (East)", loc: "AHU Room Floor 4", rating: "8,500 CFM, 7.5 kW", make: "Carrier", status: "running" },
+          { tag: "AHU-08", name: "Air Handling Unit Floor 4 (West)", loc: "AHU Room Floor 4", rating: "8,500 CFM, 7.5 kW", make: "Carrier", status: "running" },
+          { tag: "AHU-09", name: "Air Handling Unit Floor 5 (East)", loc: "AHU Room Floor 5", rating: "8,500 CFM, 7.5 kW", make: "Carrier", status: "running" },
+          { tag: "AHU-10", name: "Air Handling Unit Floor 5 (Executive)", loc: "AHU Room Floor 5", rating: "6,000 CFM, 5.5 kW", make: "Carrier", status: "maint" },
+          { tag: "AHU-11", name: "Air Handling Unit Floor 6 (Conference)", loc: "AHU Room Floor 6", rating: "7,200 CFM, 5.5 kW", make: "Carrier", status: "running" },
+          { tag: "AHU-NMAEYC", name: "NMAEYC Dedicated Air Handler", loc: "NMAEYC AHU Room", rating: "9,000 CFM, 7.5 kW", make: "Blue Star", status: "running" },
+          { tag: "TFA-01", name: "Treated Fresh Air Unit 1", loc: "Terrace East", rating: "5,000 CFM With Heat Wheel", make: "Zeco", status: "running" },
+          { tag: "TFA-02", name: "Treated Fresh Air Unit 2", loc: "Terrace West", rating: "5,000 CFM With Heat Wheel", make: "Zeco", status: "running" },
+          { tag: "PAC-01", name: "Precision Air Conditioner Unit 1", loc: "Server Room Floor 2", rating: "15 TR EC Fan", make: "Stulz", status: "running" },
+          { tag: "PAC-02", name: "Precision Air Conditioner Unit 2", loc: "Server Room Floor 2", rating: "15 TR EC Fan", make: "Stulz", status: "standby" },
+          { tag: "EXH-FAN-B1", name: "Basement 1 Jet Ventilation Fan Bank", loc: "Basement 1 Car Park", rating: "10 x 1.5 kW Induction", make: "Systemair", status: "running" },
+          { tag: "EXH-FAN-B2", name: "Basement 2 Jet Ventilation Fan Bank", loc: "Basement 2 Car Park", rating: "10 x 1.5 kW Induction", make: "Systemair", status: "running" },
+          { tag: "STAIR-PRESS-1", name: "Staircase 1 Pressurization Blower", loc: "Terrace Core", rating: "15,000 CFM, 11 kW", make: "Kruger", status: "standby" },
+          { tag: "STAIR-PRESS-2", name: "Staircase 2 Pressurization Blower", loc: "Terrace Core", rating: "15,000 CFM, 11 kW", make: "Kruger", status: "standby" },
+          { tag: "BTU-MTR-01", name: "Main Chiller Plant BTU Flow Meter", loc: "Main Supply Header", rating: "DN250 Ultrasonic", make: "Kamstrup", status: "running" },
+          { tag: "BTU-MTR-02", name: "NMAEYC Tenant BTU Sub-Meter", loc: "NMAEYC Chilled Incomer", rating: "DN100 Electromagnetic", make: "Kamstrup", status: "running" },
+          { tag: "VAV-CTRL-01", name: "Building VAV Master Controller Bank", loc: "BMS Control Room", rating: "BACnet / IP", make: "Honeywell", status: "running" },
+          { tag: "CH-VFD-01", name: "Secondary Pump Danfoss VFD Drive 1", loc: "Pump Room", rating: "45 kW FC-102", make: "Danfoss", status: "running" }
+        ]
+      },
+      "plumb": {
+        title: "Plumbing Assets Sheet",
+        count: "19 Assets",
+        items: [
+          { tag: "HYPN-DWS-P1", name: "Domestic Water HYPN Booster Pump 1", loc: "Basement Pump Room", rating: "7.5 kW, 45 m Head", make: "Grundfos Hydro MPC", status: "running" },
+          { tag: "HYPN-DWS-P2", name: "Domestic Water HYPN Booster Pump 2", loc: "Basement Pump Room", rating: "7.5 kW, 45 m Head", make: "Grundfos Hydro MPC", status: "standby" },
+          { tag: "HYPN-DWS-P3", name: "Domestic Water HYPN Booster Pump 3", loc: "Basement Pump Room", rating: "7.5 kW, 45 m Head", make: "Grundfos Hydro MPC", status: "standby" },
+          { tag: "HYPN-FWS-P1", name: "Flushing Water HYPN Booster Pump 1", loc: "Basement Pump Room", rating: "5.5 kW, 40 m Head", make: "Grundfos", status: "running" },
+          { tag: "HYPN-FWS-P2", name: "Flushing Water HYPN Booster Pump 2", loc: "Basement Pump Room", rating: "5.5 kW, 40 m Head", make: "Grundfos", status: "standby" },
+          { tag: "RAW-PUMP-01", name: "Raw Water Transfer Pump 1", loc: "Underground Tank Room", rating: "11 kW, 50 m³/h", make: "Kirloskar", status: "running" },
+          { tag: "RAW-PUMP-02", name: "Raw Water Transfer Pump 2", loc: "Underground Tank Room", rating: "11 kW, 50 m³/h", make: "Kirloskar", status: "standby" },
+          { tag: "STP-BLOWER-01", name: "STP Aeration Roots Air Blower 1", loc: "STP Plant Area", rating: "11 kW, 250 m³/h", make: "Everest Blowers", status: "running" },
+          { tag: "STP-BLOWER-02", name: "STP Aeration Roots Air Blower 2", loc: "STP Plant Area", rating: "11 kW, 250 m³/h", make: "Everest Blowers", status: "standby" },
+          { tag: "STP-FEED-P1", name: "STP Filter Feed Pump 1", loc: "STP Plant Area", rating: "3.7 kW, 20 m³/h", make: "CRI Pumps", status: "running" },
+          { tag: "STP-FEED-P2", name: "STP Filter Feed Pump 2", loc: "STP Plant Area", rating: "3.7 kW, 20 m³/h", make: "CRI Pumps", status: "standby" },
+          { tag: "DMF-01", name: "Dual Media Sand & Carbon Filter Vessel", loc: "Water Treatment Room", rating: "20 m³/h, 1200mm Dia", make: "Thermax", status: "running" },
+          { tag: "SUMP-PUMP-B1", name: "Basement 2 Storm Sump Pump 1", loc: "Basement 2 Sump Pit", rating: "3.7 kW Submersible", make: "Flygt / Xylem", status: "running" },
+          { tag: "SUMP-PUMP-B2", name: "Basement 2 Storm Sump Pump 2", loc: "Basement 2 Sump Pit", rating: "3.7 kW Submersible", make: "Flygt / Xylem", status: "maint" },
+          { tag: "SEWAGE-PUMP-1", name: "Submersible Raw Sewage Cutter Pump 1", loc: "Collection Sump", rating: "5.5 kW Non-Clog", make: "Kirloskar", status: "running" },
+          { tag: "SEWAGE-PUMP-2", name: "Submersible Raw Sewage Cutter Pump 2", loc: "Collection Sump", rating: "5.5 kW Non-Clog", make: "Kirloskar", status: "standby" },
+          { tag: "RO-PLANT-01", name: "Drinking Water Commercial RO Plant", loc: "Pantry Central Room", rating: "2,000 LPH Capacity", make: "Eureka Forbes", status: "running" },
+          { tag: "CHLOR-DOSER-1", name: "Domestic Tank Sodium Hypochlorite Doser", loc: "UGT Header Area", rating: "0-10 LPH Diaphragm", make: "Milton Roy", status: "running" },
+          { tag: "HYPN-VESSEL-1", name: "500 Litre Pressure Vessel Tank", loc: "Hydro MPC Header", rating: "500L, 10 Bar Working", make: "Zilmet", status: "running" }
+        ]
+      }
+    };
+
+    let activeCategoryKey = "hvac";
+
+    function openAssetSheet(categoryKey) {
+      activeCategoryKey = categoryKey;
+      const catView = document.getElementById('assets-category-view');
+      const sheetView = document.getElementById('assets-sheet-view');
+      const titleEl = document.getElementById('sheet-title-text');
+      const badgeEl = document.getElementById('sheet-badge-text');
+      const searchInput = document.getElementById('asset-search-input');
+
+      if (!catView || !sheetView) return;
+
+      const data = assetRegister[categoryKey];
+      if (!data) return;
+
+      catView.style.display = 'none';
+      sheetView.style.display = 'flex';
+
+      titleEl.textContent = data.title;
+      badgeEl.textContent = data.count;
+      searchInput.value = '';
+
+      renderAssetItems(data.items);
+    }
+
+    function backToAssetCategories() {
+      const catView = document.getElementById('assets-category-view');
+      const sheetView = document.getElementById('assets-sheet-view');
+      if (catView && sheetView) {
+        sheetView.style.display = 'none';
+        catView.style.display = 'flex';
+      }
+    }
+
+    function renderAssetItems(items) {
+      const container = document.getElementById('asset-items-container');
+      if (!container) return;
+
+      container.innerHTML = '';
+
+      if (items.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding:24px; color:var(--text-muted); font-size:0.8rem;">No assets found matching search criteria.</div>';
+        return;
+      }
+
+      items.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'sheet-asset-card';
+
+        let statusClass = 'status-running';
+        let statusLabel = 'Operational';
+        if (item.status === 'standby') {
+          statusClass = 'status-standby';
+          statusLabel = 'Standby';
+        } else if (item.status === 'maint') {
+          statusClass = 'status-maint';
+          statusLabel = 'Under Maint';
+        }
+
+        card.innerHTML = `
+          <div class="asset-header-row">
+            <span class="asset-tag-badge">${item.tag}</span>
+            <span class="asset-status-badge ${statusClass}">${statusLabel}</span>
+          </div>
+          <div class="asset-title-text">${item.name}</div>
+          <div class="asset-specs-grid">
+            <span><b>Loc:</b> ${item.loc}</span>
+            <span><b>Rating:</b> ${item.rating}</span>
+            <span><b>Make:</b> ${item.make}</span>
+            <span><i class="fa-solid fa-qrcode" style="color:var(--gold-primary)"></i> <b>QR Tagged</b></span>
+          </div>
+        `;
+
+        card.onclick = function() {
+          alert("Asset Tag: " + item.tag + "\n" + item.name + "\nLocation: " + item.loc + "\nCapacity: " + item.rating + "\nMake: " + item.make + "\nStatus: " + statusLabel);
+        };
+
+        container.appendChild(card);
+      });
+    }
+
+    function filterAssetSheet() {
+      const searchInput = document.getElementById('asset-search-input');
+      const q = searchInput.value.toLowerCase().trim();
+      const data = assetRegister[activeCategoryKey];
+      if (!data) return;
+
+      if (!q) {
+        renderAssetItems(data.items);
+        return;
+      }
+
+      const filtered = data.items.filter(it => 
+        it.tag.toLowerCase().includes(q) ||
+        it.name.toLowerCase().includes(q) ||
+        it.loc.toLowerCase().includes(q) ||
+        it.make.toLowerCase().includes(q)
+      );
+
+      renderAssetItems(filtered);
+    }
+
+</script>
+</body>
+</html>
